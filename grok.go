@@ -8,9 +8,9 @@ import (
 )
 
 type Groked struct {
-	ListingPrev string
-	ListingNext string
-	Children    []Thing
+	ListingPrev string  // Indicates thing before this listing (if listing was groked)
+	ListingNext string  // Indicates thing after this listing (if listing was groked)
+	Children    []Thing // Children things to the listing, or the single thing groked
 }
 
 type internalGroked struct {
@@ -19,7 +19,7 @@ type internalGroked struct {
 }
 
 type listing struct {
-	Children []internalGroked // The children of the listing
+	Children []internalGroked // the children of the listing
 	Before   string           // indicates value for prev filter
 	After    string           // indicates value for next filter
 }
@@ -41,27 +41,27 @@ type internalThing struct {
 }
 
 func addNewThing(in internalGroked, out *Groked) error {
-
-	var currentKind KindType
-
-	switch in.Kind {
-	case "t1":
-		currentKind = Comment
-	case "t3":
-		currentKind = Link
-	case "t5":
-		currentKind = Subreddit
-	default:
-		return errors.New("Unable to grok: Unsupported kind \"" + in.Kind + "\"")
+	// 
+	// Normalize Kind. Do before parsing "data", in case
+	// we cannot handle the kind
+	//
+	currentKind, error := ParseKind(in.Kind)
+	if error != nil {
+		return errors.New("Unable to grok: " + error.Error())
 	}
 
+	// 
+	// Parse data portion of thing
+	//
 	var parsedIn internalThing
 	if error := json.Unmarshal(in.Data, &parsedIn); error != nil {
-		return errors.New("Unable to decode thing of type \"" + in.Kind + "\"")
+		return errors.New("Unable to grok: Unable to decode thing of type \"" + in.Kind + "\"")
 	}
 
+	//
+	// Normalize body text
+	//
 	var bodyHtml string
-
 	// sucks that the switch happens twice, but I'd rather do
 	// the unmarshal after we know it can be properly decoded
 	switch currentKind {
@@ -72,9 +72,11 @@ func addNewThing(in internalGroked, out *Groked) error {
 	default:
 	}
 
+	//
+	// Normalize creation and last modification timestamp
+	//
 	creationTime := int64(parsedIn.Created_utc)
 	lastModificationTime := creationTime
-
 	if parsedIn.Edited != nil {
 
 		editValue := reflect.ValueOf(parsedIn.Edited)
@@ -82,11 +84,34 @@ func addNewThing(in internalGroked, out *Groked) error {
 		if editValue.Kind() == reflect.Float64 {
 			lastModificationTime = int64(editValue.Float())
 		} else if editValue.Kind() != reflect.Bool {
-			return errors.New("Unexpected type \"" + editValue.Type().String() + "\" for edited field")
+			return errors.New("Unable to grok: Unexpected type \"" + editValue.Type().String() + "\" for edited field")
 		}
 	}
 
-	out.Children = append(out.Children, Thing{parsedIn.Author, creationTime, parsedIn.Id, lastModificationTime, parsedIn.Parent_id, parsedIn.Replies, parsedIn.Subreddit, parsedIn.Subreddit_id, currentKind, bodyHtml, parsedIn.Title, parsedIn.Url})
+	//
+	// Normalize Id fields
+	//
+	thingId, error := ParseId(parsedIn.Id) // thing id should always be present
+	if error != nil {
+		return errors.New("Unable to grok: " + error.Error())
+	}
+
+	subredditId := GlobalId{thingId, Subreddit}
+	parentId := GlobalId{}
+	if currentKind != Subreddit {
+		subredditId.Id, error = ParseId(parsedIn.Subreddit_id)
+		if error != nil {
+			return errors.New("Unable to grok subreddit id: " + error.Error())
+		}
+
+		parentId, error = ParseGlobalId(parsedIn.Parent_id)
+		if error != nil {
+			return errors.New("Unable to grok parent id: " + error.Error())
+		}
+	}
+	
+
+	out.Children = append(out.Children, Thing{parsedIn.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, parentId, parsedIn.Replies, parsedIn.Subreddit, subredditId, currentKind, bodyHtml, parsedIn.Title, parsedIn.Url})
 	return nil
 }
 

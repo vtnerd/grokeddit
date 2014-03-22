@@ -5,15 +5,16 @@ import (
 	"strings"
 )
 
-/*
-Uniquely identifies any "thing" in reddit. Things processed by grokeddit are:
-subreddits, links, and comments.
-*/
+/* Uniquely identifies any "thing" in reddit. Things processed by grokeddit are:
+subreddits, links, and comments. */
 type GlobalId struct {
 	Id   ThingId  // unique identifier
 	Kind KindType // the type of thing
 }
 
+/* Parses the global id format, as used by reddit. The format is "type_id". 
+Type must be t1, t2, t3, t4, or t5. id must be a base36 number. Error is 
+returned if the format is invalid. */
 func ParseGlobalId(globalId string) (GlobalId, error) {
 
 	splitId := strings.Split(globalId, "_")
@@ -34,9 +35,7 @@ func ParseGlobalId(globalId string) (GlobalId, error) {
 	return GlobalId{id, kind}, nil
 }
 
-/*
-Returns a string representation for the global ID, as used by reddit.
-*/
+// Returns a string representation for the global ID, as used by reddit.
 func (globalId *GlobalId) String() string {
 	return globalId.Kind.String() + "_" + globalId.Id.String()
 }

@@ -13,49 +13,43 @@ type Groked struct {
 	Children    []Thing // Children things to the listing, or the single thing groked
 }
 
-type internalGroked struct {
+type thing struct {
 	Kind string
-	Data json.RawMessage
+	Data struct {
+		Author        string      // name of the poster
+		Body_html     string      // html from a comment
+		Created_utc   float64     // utc of creation time
+		Display_name  string      // Name of subreddit (only used with subreddit thing type)
+		Edited        interface{} // false or utc of last edit
+		Id            string      // unique indentifier for the thing
+		lastUpdate    float64     // after parsing, this will be the last modification time (usually created_utc)
+		Parent_id     string      // parent id of a comment
+		Replies       []thing     // replies to a comment
+		Selftext_html string      // html from a new post
+		Subreddit     string      // name of the subreddit associated with the thing
+		Subreddit_id  string      // id of the subreddit associated with the thing
+		Title         string      // title of the post
+		Url           string      // url of the post
+	}
 }
 
 type listing struct {
-	Children []internalGroked // the children of the listing
-	Before   string           // indicates value for prev filter
-	After    string           // indicates value for next filter
+	Data struct {
+		Children []thing // the children of the listing
+		Before   string  // indicates value for prev filter
+		After    string  // indicates value for next filter
+	}
 }
 
-type internalThing struct {
-	Author        string          // name of the poster
-	Body_html     string          // html from a comment
-	Created_utc   float64         // utc of creation time
-	Edited        interface{}     // false or utc of last edit
-	Id            string          // unique indentifier for the thing
-	lastUpdate    float64         // after parsing, this will be the last modification time (usually created_utc)
-	Parent_id     string          // parent id of a comment
-	Replies       json.RawMessage // unparsed replies to a comment
-	Selftext_html string          // html from a new post
-	Subreddit     string          // name of the subreddit associated with the thing
-	Subreddit_id  string          // id of the subreddit associated with the thing
-	Title         string          // title of the post
-	Url           string          // url of the post
-}
+func createNewThing(in thing) (Thing, error) {
 
-func addNewThing(in internalGroked, out *Groked) error {
-	// 
-	// Normalize Kind. Do before parsing "data", in case
-	// we cannot handle the kind
+	//
+	// Normalize Kind. Do first, since nothing else will work with
+	// unsupported kind being parsed.
 	//
 	currentKind, error := ParseKind(in.Kind)
 	if error != nil {
-		return errors.New("Unable to grok: " + error.Error())
-	}
-
-	// 
-	// Parse data portion of thing
-	//
-	var parsedIn internalThing
-	if error := json.Unmarshal(in.Data, &parsedIn); error != nil {
-		return errors.New("Unable to grok: Unable to decode thing of type \"" + in.Kind + "\"")
+		return Thing{}, errors.New("Unable to grok: " + error.Error())
 	}
 
 	//
@@ -66,112 +60,123 @@ func addNewThing(in internalGroked, out *Groked) error {
 	// the unmarshal after we know it can be properly decoded
 	switch currentKind {
 	case Comment:
-		bodyHtml = parsedIn.Body_html
+		bodyHtml = in.Data.Body_html
 	case Link:
-		bodyHtml = parsedIn.Selftext_html
+		bodyHtml = in.Data.Selftext_html
 	default:
 	}
 
 	//
 	// Normalize creation and last modification timestamp
 	//
-	creationTime := int64(parsedIn.Created_utc)
+	creationTime := int64(in.Data.Created_utc)
 	lastModificationTime := creationTime
-	if parsedIn.Edited != nil {
+	if in.Data.Edited != nil {
 
-		editValue := reflect.ValueOf(parsedIn.Edited)
+		editValue := reflect.ValueOf(in.Data.Edited)
 
 		if editValue.Kind() == reflect.Float64 {
 			lastModificationTime = int64(editValue.Float())
 		} else if editValue.Kind() != reflect.Bool {
-			return errors.New("Unable to grok: Unexpected type \"" + editValue.Type().String() + "\" for edited field")
+			return Thing{}, errors.New("Unable to grok: Unexpected type \"" + editValue.Type().String() + "\" for edited field")
 		}
 	}
 
 	//
 	// Normalize Id fields
 	//
-	thingId, error := ParseId(parsedIn.Id) // thing id should always be present
+	thingId, error := ParseId(in.Data.Id) // thing id should always be present
 	if error != nil {
-		return errors.New("Unable to grok: " + error.Error())
+		return Thing{}, errors.New("Unable to grok: " + error.Error())
 	}
 
+	subredditName := in.Data.Subreddit
 	subredditId := GlobalId{thingId, Subreddit}
 	parentId := GlobalId{}
 	if currentKind != Subreddit {
-		subredditId.Id, error = ParseId(parsedIn.Subreddit_id)
+		subredditId.Id, error = ParseId(in.Data.Subreddit_id)
 		if error != nil {
-			return errors.New("Unable to grok subreddit id: " + error.Error())
+			return Thing{}, errors.New("Unable to grok subreddit id: " + error.Error())
 		}
 
-		parentId, error = ParseGlobalId(parsedIn.Parent_id)
+		parentId, error = ParseGlobalId(in.Data.Parent_id)
 		if error != nil {
-			return errors.New("Unable to grok parent id: " + error.Error())
+			return Thing{}, errors.New("Unable to grok parent id: " + error.Error())
+		}
+	} else { // type subreddit
+		subredditName = in.Data.Display_name
+	}
+
+	//
+	// Cull through replies too
+	//
+	var newReplies []Thing
+	if in.Data.Replies != nil && len(in.Data.Replies) > 0 {
+		newReplies = make([]Thing, 0, len(in.Data.Replies))
+
+		for _, reply := range in.Data.Replies {
+			newReply, error := createNewThing(reply)
+			if error != nil {
+				return Thing{}, error
+			}
+			newReplies = append(newReplies, newReply)
 		}
 	}
-	
 
-	out.Children = append(out.Children, Thing{parsedIn.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, parentId, parsedIn.Replies, parsedIn.Subreddit, subredditId, currentKind, bodyHtml, parsedIn.Title, parsedIn.Url})
-	return nil
+	return Thing{in.Data.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, parentId, newReplies, subredditName, subredditId, bodyHtml, in.Data.Title, in.Data.Url}, nil
 }
 
-func internalGrok(parsedObject internalGroked) (*Groked, error) {
+func internalGrok(parsedListing listing) (Groked, error) {
 	groked := Groked{}
 
-	if parsedObject.Kind == "Listing" {
-		var parsedListing listing
-		if error := json.Unmarshal(parsedObject.Data, &parsedListing); error != nil {
-			return nil, errors.New("Unable to grok listing: " + error.Error())
+	groked.Children = make([]Thing, 0, len(parsedListing.Data.Children))
+	groked.ListingPrev = parsedListing.Data.Before
+	groked.ListingNext = parsedListing.Data.After
+
+	for _, element := range parsedListing.Data.Children {
+
+		thing, error := createNewThing(element)
+
+		// There should be only "Things" in a child listing. So
+		// this will return an error if a non-thing is found.
+		if error != nil {
+			return groked, error
 		}
 
-		groked.ListingPrev = parsedListing.Before
-		groked.ListingNext = parsedListing.After
-		groked.Children = make([]Thing, 0, len(parsedListing.Children))
-
-		for _, element := range parsedListing.Children {
-
-			// There should be only "Things" in a child listing. So
-			// this will return an error if a non-thing is found.
-			if error := addNewThing(element, &groked); error != nil {
-				return nil, error
-			}
-		}
-	} else {
-		groked.Children = make([]Thing, 0, 1)
-		if error := addNewThing(parsedObject, &groked); error != nil {
-			return nil, error
-		}
+		groked.Children = append(groked.Children, thing)
 	}
 
-	return &groked, nil
+	return groked, nil
 }
 
-func GrokObject(dataSource io.Reader) (*Groked, error) {
-	var parsedObject internalGroked
-	if error := json.NewDecoder(dataSource).Decode(&parsedObject); error != nil && error != io.EOF {
-		return nil, errors.New("Unable to grok reddit JSON object: " + error.Error())
+func GrokListing(dataSource io.Reader) (Groked, error) {
+	var parsedData listing
+	if error := json.NewDecoder(dataSource).Decode(&parsedData); error != nil && error != io.EOF {
+		return Groked{}, errors.New("Unable to grok reddit JSON object: " + error.Error())
 	}
 
-	return internalGrok(parsedObject)
+	return internalGrok(parsedData)
 }
 
-func GrokArray(dataSource io.Reader) ([]Groked, error) {
-	var parsedArray []internalGroked
+func GrokListingArray(dataSource io.Reader) ([]Groked, error) {
+	var parsedData []listing
 
-	if error := json.NewDecoder(dataSource).Decode(&parsedArray); error != nil && error != io.EOF {
-		return nil, errors.New("Unable to grok reddit JSON array: " + error.Error())
+	var grokList []Groked
+
+	if error := json.NewDecoder(dataSource).Decode(&parsedData); error != nil && error != io.EOF {
+		return grokList, errors.New("Unable to grok reddit JSON array: " + error.Error())
 	}
 
-	grokList := make([]Groked, 0, len(parsedArray))
+	grokList = make([]Groked, 0, len(parsedData))
 
-	for _, parsedObject := range parsedArray {
-		newGrok, error := internalGrok(parsedObject)
+	for _, parsedListing := range parsedData {
+		newGrok, error := internalGrok(parsedListing)
 
 		if error != nil {
-			return nil, error
+			return grokList, error
 		}
 
-		grokList = append(grokList, *newGrok)
+		grokList = append(grokList, newGrok)
 	}
 
 	return grokList, nil

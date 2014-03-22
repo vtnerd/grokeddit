@@ -1,7 +1,7 @@
 package grokeddit
 
 import (
-	"encoding/json"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -373,59 +373,67 @@ const (
 ]`
 )
 
-type expectedThing struct {
-	expectedType       ThingType
-	expectedFieldCount uint
+func expectEqual(t *testing.T, expected interface{}, actual interface{}, failMessage string) bool {
+	expectedType := reflect.ValueOf(expected)
+	actualType := reflect.ValueOf(actual)
+
+	if expectedType.Kind() != actualType.Kind() {
+		t.Fatal(failMessage + ": Expected type \"" + expectedType.Kind().String() + "\" but got type \"" + actualType.Kind().String() + "\"")
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Error(failMessage + ": Expected \"" + expectedType.String() + "\" but got \"" + actualType.String() + "\"")
+		return false
+	}
+
+	return true
 }
 
-func verifyGroked(t *testing.T, actual *Groked, expectedPrev string, expectedNext string, expectedThings []expectedThing) {
-
-	if actual == nil {
-		t.Fatal("Actual should not be nil")
+func assertEqual(t *testing.T, expected interface{}, actual interface{}, failMessage string) {
+	if !expectEqual(t, expected, actual, failMessage) {
+		t.Fatal("assertion requested, aborting test")
 	}
+}
 
-	if actual.ListingPrev != expectedPrev {
-		t.Error("Expected previous listing \"" + expectedPrev + "\" but got \"" + actual.ListingPrev + "\"")
-	}
+func verifyGroked(t *testing.T, expected Groked, actual Groked) {
 
-	if actual.ListingNext != expectedNext {
-		t.Error("Expected next listing \"" + expectedNext + "\" but got \"" + actual.ListingNext + "\"")
-	}
-
-	if len(actual.Children) != len(expectedThings) {
-		t.Fatal("Expected " + strconv.Itoa(len(expectedThings)) + " but got " + strconv.Itoa(len(actual.Children)))
-	}
-
-	for index, expectedThing := range expectedThings {
-		if expectedThing.expectedType != actual.Children[index].Type {
-			t.Error("Incorrect kind at index " + strconv.Itoa(index))
-		}
-
-		elements := make(map[string]interface{})
-		if error := json.Unmarshal(actual.Children[index].data, &elements); error != nil {
-			t.Error("Error unmarshalling data at index " + strconv.Itoa(index))
-		}
-
-		if expectedThing.expectedFieldCount != uint(len(elements)) {
-			t.Error("Expected " + strconv.FormatUint(uint64(expectedThing.expectedFieldCount), 10) + " fields but got " + strconv.Itoa(len(elements)) + " at index " + strconv.Itoa(index))
-		}
+	expectEqual(t, expected.ListingPrev, actual.ListingPrev, "Previous listing error")
+	expectEqual(t, expected.ListingNext, actual.ListingNext, "Next listing error")
+	assertEqual(t, len(expected.Children), len(actual.Children), "Number of children error")
+	
+	for index, expectedThing := range expected.Children {
+		errorMessage := " error at child index " + strconv.Itoa(index)
+		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author" +errorMessage)
+		expectEqual(t, expectedThing.Created_utc, actual.Children[index].Created_utc, "Created timestamp" + errorMessage)
+		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "global id" + errorMessage)
+//		expectEqual(t, expectedThing.replies !+ actual.Children[index].replies, errorMessage)
+		expectEqual(t, expectedThing.Subreddit, actual.Children[index].Subreddit, "Subreddit name" + errorMessage)
+		expectEqual(t, expectedThing.SubredditId, actual.Children[index].SubredditId, "Subreddit id" + errorMessage)
+		expectEqual(t, expectedThing.Text_html, actual.Children[index].Text_html, "Text html" + errorMessage)
+		expectEqual(t, expectedThing.Title, actual.Children[index].Title, "Title" + errorMessage)
+		expectEqual(t, expectedThing.Url, actual.Children[index].Url, "Url" + errorMessage)
 	}
 }
 
 func TestRedditPage(t *testing.T) {
-	groked, error := GrokObject(strings.NewReader(reddit3))
+	actual, error := GrokListing(strings.NewReader(reddit3))
 	if error != nil {
-		t.Error("Failed to parse object: " + error.Error())
+		t.Error("Failed to parse listing: " + error.Error())
 	}
 
-	expectedThings := make([]expectedThing, 0, 3)
-	expectedThings = append(expectedThings, expectedThing{SubredditType, 28})
-	expectedThings = append(expectedThings, expectedThing{SubredditType, 28})
-	expectedThings = append(expectedThings, expectedThing{SubredditType, 27})
+	expected := Groked{}
 
-	verifyGroked(t, groked, "blah blah made up", "t5_2qh03", expectedThings)
+	expected.ListingPrev = "blah blah made up"
+	expected.ListingNext = "t5_2qh03"
+	expected.Children = make([]Thing, 3)
+
+	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, nil, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
+	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201246556, GlobalId{}, nil, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
+	expected.Children[2] = Thing{"", 1190054605, GlobalId{4594323, Subreddit}, 1190054605, GlobalId{}, nil, "gaming", GlobalId{4594323, Subreddit}, "", "", "/r/gaming/"}
+
+	verifyGroked(t, expected, actual)
 }
-
+/*
 func TestSubredditPage(t *testing.T) {
 	groked, error := GrokObject(strings.NewReader(subreddit3Posts))
 	if error != nil {
@@ -460,3 +468,4 @@ func TestCommentsPage(t *testing.T) {
 	expectedThings[0].expectedFieldCount = 25
 	verifyGroked(t, &groked[1], "", "", expectedThings)
 }
+*/

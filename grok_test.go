@@ -406,7 +406,10 @@ func verifyGroked(t *testing.T, expected Groked, actual Groked) {
 		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author" +errorMessage)
 		expectEqual(t, expectedThing.Created_utc, actual.Children[index].Created_utc, "Created timestamp" + errorMessage)
 		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "global id" + errorMessage)
-//		expectEqual(t, expectedThing.replies !+ actual.Children[index].replies, errorMessage)
+
+		// recursively check replies
+		verifyGroked(t, expectedThing.Replies, actual.Children[index].Replies)
+
 		expectEqual(t, expectedThing.Subreddit, actual.Children[index].Subreddit, "Subreddit name" + errorMessage)
 		expectEqual(t, expectedThing.SubredditId, actual.Children[index].SubredditId, "Subreddit id" + errorMessage)
 		expectEqual(t, expectedThing.Text_html, actual.Children[index].Text_html, "Text html" + errorMessage)

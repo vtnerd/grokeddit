@@ -1,5 +1,7 @@
 package grokeddit
 
+/* Represents any type of thing in reddit. Some fields may be 
+empty/invalid for the particular type. */
 type Thing struct {
 	Author      string   // name of the poster
 	Created_utc int64    // utc of creation time

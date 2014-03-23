@@ -371,6 +371,324 @@ const (
         }
     }
 ]`
+
+	commentTree string = `
+[
+    {
+        "kind": "Listing",
+        "data": {
+            "modhash": "73e9l7288vd5cbae00ea93c692511c4634a2d9ed81578c0390",
+            "children": [
+                {
+                    "kind": "t3",
+                    "data": {
+                        "domain": "self.askscience",
+                        "banned_by": null,
+                        "media_embed": {},
+                        "subreddit": "askscience",
+                        "selftext_html": "<html>og link text</html>",
+                        "selftext": "og link text",
+                        "likes": null,
+                        "secure_media": null,
+                        "link_flair_text": "Biology",
+                        "id": "214czs",
+                        "gilded": 0,
+                        "secure_media_embed": {},
+                        "clicked": false,
+                        "stickied": false,
+                        "author": "drumersrule",
+                        "media": null,
+                        "score": 760,
+                        "approved_by": null,
+                        "over_18": false,
+                        "hidden": false,
+                        "thumbnail": "",
+                        "subreddit_id": "t5_2qm4e",
+                        "edited": false,
+                        "link_flair_css_class": "bio",
+                        "author_flair_css_class": null,
+                        "downs": 373,
+                        "saved": false,
+                        "is_self": true,
+                        "permalink": "/r/askscience/comments/214czs/do_offspring_ever_take_care_of_their_parents_in/",
+                        "name": "t3_214czs",
+                        "created": 1395570389,
+                        "url": "http://www.reddit.com/r/askscience/comments/214czs/do_offspring_ever_take_care_of_their_parents_in/",
+                        "author_flair_text": null,
+                        "title": "Do offspring ever take care of their parents in other species?",
+                        "created_utc": 1395541589,
+                        "ups": 1133,
+                        "num_comments": 137,
+                        "visited": false,
+                        "num_reports": null,
+                        "distinguished": null
+                    }
+                }
+            ],
+            "after": null,
+            "before": null
+        }
+    },
+    {
+        "kind": "Listing",
+        "data": {
+            "modhash": "73e9l7288vd5cbae00ea93c692511c4634a2d9ed81578c0390",
+            "children": [
+                {
+                    "kind": "t1",
+                    "data": {
+                        "subreddit_id": "t5_2qm4e",
+                        "banned_by": null,
+                        "subreddit": "askscience",
+                        "likes": null,
+                        "replies": {
+                            "kind": "Listing",
+                            "data": {
+                                "modhash": "73e9l7288vd5cbae00ea93c692511c4634a2d9ed81578c0390",
+                                "children": [
+                                    {
+                                        "kind": "t1",
+                                        "data": {
+                                            "subreddit_id": "t5_2qm4e",
+                                            "banned_by": null,
+                                            "subreddit": "askscience",
+                                            "likes": null,
+                                            "replies": "",
+                                            "saved": false,
+                                            "id": "cg9qapl",
+                                            "gilded": 0,
+                                            "author": "PM_ME_YOUR_NIGHTMARE",
+                                            "parent_id": "t1_cg9ptzf",
+                                            "approved_by": null,
+                                            "body": "first reply to comment",
+                                            "edited": false,
+                                            "author_flair_css_class": null,
+                                            "downs": 0,
+                                            "body_html": "<html>first reply to comment</html>",
+                                            "link_id": "t3_214czs",
+                                            "score_hidden": false,
+                                            "name": "t1_cg9qapl",
+                                            "created": 1395610381,
+                                            "author_flair_text": null,
+                                            "created_utc": 1395581581,
+                                            "distinguished": null,
+                                            "num_reports": null,
+                                            "ups": 3
+                                        }
+                                    },
+                                    {
+                                        "kind": "t1",
+                                        "data": {
+                                            "subreddit_id": "t5_2qm4e",
+                                            "banned_by": null,
+                                            "subreddit": "askscience",
+                                            "likes": null,
+                                            "replies": {
+                                                "kind": "Listing",
+                                                "data": {
+                                                    "modhash": "73e9l7288vd5cbae00ea93c692511c4634a2d9ed81578c0390",
+                                                    "children": [
+                                                        {
+                                                            "kind": "t1",
+                                                            "data": {
+                                                                "subreddit_id": "t5_2qm4e",
+                                                                "banned_by": null,
+                                                                "subreddit": "askscience",
+                                                                "likes": null,
+                                                                "replies": "",
+                                                                "saved": false,
+                                                                "id": "cg9s0vd",
+                                                                "gilded": 0,
+                                                                "author": "inderstube",
+                                                                "parent_id": "t1_cg9qv5w",
+                                                                "approved_by": null,
+                                                                "body": "first reply to second comment",
+                                                                "edited": false,
+                                                                "author_flair_css_class": null,
+                                                                "downs": 0,
+                                                                "body_html": "<html>first reply to second comment</html>",
+                                                                "link_id": "t3_214czs",
+                                                                "score_hidden": false,
+                                                                "name": "t1_cg9s0vd",
+                                                                "created": 1395616509,
+                                                                "author_flair_text": null,
+                                                                "created_utc": 1395587709,
+                                                                "distinguished": null,
+                                                                "num_reports": null,
+                                                                "ups": 1
+                                                            }
+                                                        }
+                                                    ],
+                                                    "after": null,
+                                                    "before": "t5_2qh04"
+                                                }
+                                            },
+                                            "saved": false,
+                                            "id": "cg9qv5w",
+                                            "gilded": 0,
+                                            "author": "Dave37",
+                                            "parent_id": "t1_cg9ptzf",
+                                            "approved_by": null,
+                                            "body": "second reply to comment",
+                                            "edited": false,
+                                            "author_flair_css_class": null,
+                                            "downs": 0,
+                                            "body_html": "<html>second reply to comment</html>",
+                                            "link_id": "t3_214czs",
+                                            "score_hidden": false,
+                                            "name": "t1_cg9qv5w",
+                                            "created": 1395612719,
+                                            "author_flair_text": null,
+                                            "created_utc": 1395583919,
+                                            "distinguished": null,
+                                            "num_reports": null,
+                                            "ups": 3
+                                        }
+                                    }
+                                ],
+                                "after": "t5_2qh03",
+                                "before": null
+                            }
+                        },
+                        "saved": false,
+                        "id": "cg9ptzf",
+                        "gilded": 0,
+                        "author": "inderstube",
+                        "parent_id": "t3_214czs",
+                        "approved_by": null,
+                        "body": "random comment in comment tree",
+                        "edited": false,
+                        "author_flair_css_class": null,
+                        "downs": 6,
+                        "body_html": "<html>random comment in comment tree</html>",
+                        "link_id": "t3_214czs",
+                        "score_hidden": false,
+                        "name": "t1_cg9ptzf",
+                        "created": 1395608112,
+                        "author_flair_text": null,
+                        "created_utc": 1395579312,
+                        "distinguished": null,
+                        "num_reports": null,
+                        "ups": 3
+                    }
+                }
+            ],
+            "after": null,
+            "before": null
+        }
+    }
+]`
+
+	commentListing string = `
+{
+    "kind": "Listing",
+    "data": {
+        "modhash": "9thsdknfa49c38eb55e7db72adf564df864c684bbb2a28efab",
+        "children": [
+            {
+                "kind": "t1",
+                "data": {
+                    "subreddit_id": "t5_2qm4e",
+                    "link_title": "Can the Casimir effect take place near a black hole?",
+                    "banned_by": null,
+                    "subreddit": "askscience",
+                    "link_author": "Blocksy",
+                    "likes": null,
+                    "replies": null,
+                    "saved": false,
+                    "id": "cg9tfgc",
+                    "gilded": 0,
+                    "author": "babeltoothe",
+                    "parent_id": "t1_cg9s6hv",
+                    "approved_by": null,
+                    "body": "comment 1",
+                    "edited": false,
+                    "author_flair_css_class": null,
+                    "downs": 0,
+                    "body_html": "<html>comment 1</html>",
+                    "link_id": "t3_2156gs",
+                    "score_hidden": false,
+                    "name": "t1_cg9tfgc",
+                    "created": 1395620331,
+                    "author_flair_text": null,
+                    "link_url": "http://www.reddit.com/r/askscience/comments/2156gs/can_the_casimir_effect_take_place_near_a_black/",
+                    "created_utc": 1395591531,
+                    "ups": 1,
+                    "num_reports": null,
+                    "distinguished": null
+                }
+            },
+            {
+                "kind": "t1",
+                "data": {
+                    "subreddit_id": "t5_2qm4e",
+                    "link_title": "Is there any knowledge on how it has affected evolution that some genes are dominant, and some recessive?",
+                    "banned_by": null,
+                    "subreddit": "askscience",
+                    "link_author": "throwaway774829",
+                    "likes": null,
+                    "replies": null,
+                    "saved": false,
+                    "id": "cg9te8o",
+                    "gilded": 0,
+                    "author": "Apiphilia",
+                    "parent_id": "t3_21539t",
+                    "approved_by": null,
+                    "body": "comment 2",
+                    "edited": false,
+                    "author_flair_css_class": null,
+                    "downs": 0,
+                    "body_html": "<html>comment 2</html>",
+                    "link_id": "t3_21539t",
+                    "score_hidden": false,
+                    "name": "t1_cg9te8o",
+                    "created": 1395620242,
+                    "author_flair_text": null,
+                    "link_url": "http://www.reddit.com/r/askscience/comments/21539t/is_there_any_knowledge_on_how_it_has_affected/",
+                    "created_utc": 1395591442,
+                    "ups": 1,
+                    "num_reports": null,
+                    "distinguished": null
+                }
+            },
+            {
+                "kind": "t1",
+                "data": {
+                    "subreddit_id": "t5_2qm4e",
+                    "link_title": "Transcendental numbers in a different base?",
+                    "banned_by": null,
+                    "subreddit": "askscience",
+                    "link_author": "AlexxTheKid",
+                    "likes": null,
+                    "replies": null,
+                    "saved": false,
+                    "id": "cg9tdui",
+                    "gilded": 0,
+                    "author": "AlexxTheKid",
+                    "parent_id": "t1_cg9mvtk",
+                    "approved_by": null,
+                    "body": "comment 3",
+                    "edited": false,
+                    "author_flair_css_class": null,
+                    "downs": 0,
+                    "body_html": "<html>comment 3</html>",
+                    "link_id": "t3_2148x2",
+                    "score_hidden": false,
+                    "name": "t1_cg9tdui",
+                    "created": 1395620214,
+                    "author_flair_text": null,
+                    "link_url": "http://www.reddit.com/r/askscience/comments/2148x2/transcendental_numbers_in_a_different_base/",
+                    "created_utc": 1395591414,
+                    "ups": 1,
+                    "num_reports": null,
+                    "distinguished": null
+                }
+            }
+        ],
+        "after": "t1_cg9tdui",
+        "before": null
+    }
+}`
 )
 
 func expectEqual(t *testing.T, expected interface{}, actual interface{}, failMessage string) bool {
@@ -405,7 +723,9 @@ func verifyGroked(t *testing.T, expected Groked, actual Groked) {
 		errorMessage := " error at child index " + strconv.Itoa(index)
 		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author" +errorMessage)
 		expectEqual(t, expectedThing.Created_utc, actual.Children[index].Created_utc, "Created timestamp" + errorMessage)
-		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "global id" + errorMessage)
+		expectEqual(t, expectedThing.Id, actual.Children[index].Id, "id" + errorMessage)
+		expectEqual(t, expectedThing.LastUpdate, actual.Children[index].LastUpdate, "Last update timestamp" + errorMessage)
+		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "parent id" + errorMessage)
 
 		// recursively check replies
 		verifyGroked(t, expectedThing.Replies, actual.Children[index].Replies)
@@ -431,7 +751,7 @@ func TestRedditPage(t *testing.T) {
 	expected.Children = make([]Thing, 3)
 
 	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, Groked{}, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
-	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201246556, GlobalId{}, Groked{}, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
+	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201242956, GlobalId{}, Groked{}, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
 	expected.Children[2] = Thing{"", 1190054605, GlobalId{4594323, Subreddit}, 1190054605, GlobalId{}, Groked{}, "gaming", GlobalId{4594323, Subreddit}, "", "", "/r/gaming/"}
 
 	verifyGroked(t, expected, actual)
@@ -454,7 +774,7 @@ func TestSubredditPage(t *testing.T) {
 	verifyGroked(t, expected, actual)
 }
 
-func TestCommentsPage(t *testing.T) {
+func TestCommentsPageWith1Comment(t *testing.T) {
 
 	actual, error := GrokListingArray(strings.NewReader(comments1Reply))
 	if error != nil {
@@ -473,4 +793,50 @@ func TestCommentsPage(t *testing.T) {
 
 	verifyGroked(t, expected[0], actual[0])
 	verifyGroked(t, expected[1], actual[1])
+}
+
+func TestCommentTree(t *testing.T) {
+	actual, error := GrokListingArray(strings.NewReader(commentTree))
+	if error != nil {
+		t.Error("Failed to parse array: " + error.Error())
+	}
+
+	assertEqual(t, len(actual), 2, "Groked array failure")
+
+	expected := make([]Groked, 2)
+	expected[0].Children = make([]Thing, 1)
+	expected[0].Children[0] = Thing{"drumersrule", 1395541589, GlobalId{122815432, Link}, 1395541589, GlobalId{}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>og link text</html>", "Do offspring ever take care of their parents in other species?", "http://www.reddit.com/r/askscience/comments/214czs/do_offspring_ever_take_care_of_their_parents_in/"}
+
+	expected[1].Children = make([]Thing, 1)
+	expected[1].Children[0] = Thing{"inderstube", 1395579312, GlobalId{27105168651, Comment}, 1395579312, GlobalId{122815432, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>random comment in comment tree</html>", "", ""}
+
+	expected[1].Children[0].Replies.ListingNext = "t5_2qh03"
+	expected[1].Children[0].Replies.Children = make([]Thing, 2)
+	expected[1].Children[0].Replies.Children[0] = Thing{"PM_ME_YOUR_NIGHTMARE", 1395581581, GlobalId{27105190329, Comment}, 1395581581, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to comment</html>", "", ""}
+	expected[1].Children[0].Replies.Children[1] = Thing{"Dave37", 1395583919, GlobalId{27105216836, Comment}, 1395583919, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>second reply to comment</html>", "", ""}
+
+	expected[1].Children[0].Replies.Children[1].Replies.ListingPrev = "t5_2qh04"
+	expected[1].Children[0].Replies.Children[1].Replies.Children = make([]Thing, 1)
+	expected[1].Children[0].Replies.Children[1].Replies.Children[0] = Thing{"inderstube", 1395587709, GlobalId{27105270889, Comment}, 1395587709, GlobalId{27105216836, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to second comment</html>", "", ""}
+
+	verifyGroked(t, expected[0], actual[0])
+	verifyGroked(t, expected[1], actual[1])
+}
+
+func TestCommentListing(t *testing.T) {
+
+	actual, error := GrokListing(strings.NewReader(commentListing))
+	if error != nil {
+		t.Error("Failed to parse array: " + error.Error())
+	}
+
+	expected := Groked{}
+	expected.ListingPrev = ""
+	expected.ListingNext = "t1_cg9tdui"
+	expected.Children = make([]Thing, 3)
+	expected.Children[0] = Thing{"babeltoothe", 1395591531, GlobalId{27105336444, Comment}, 1395591531, GlobalId{27105278179, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 1</html>", "", ""}
+	expected.Children[1] = Thing{"Apiphilia", 1395591442, GlobalId{27105334872, Comment}, 1395591442, GlobalId{122849489, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 2</html>", "", ""}
+	expected.Children[2] = Thing{"AlexxTheKid", 1395591414, GlobalId{27105334362, Comment}, 1395591414, GlobalId{27105031064, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 3</html>", "", ""}
+
+	verifyGroked(t, expected, actual)
 }

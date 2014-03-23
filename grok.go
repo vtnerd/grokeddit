@@ -1,6 +1,7 @@
 package grokeddit
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -16,20 +17,20 @@ type Groked struct {
 type thing struct {
 	Kind string
 	Data struct {
-		Author        string      // name of the poster
-		Body_html     string      // html from a comment
-		Created_utc   float64     // utc of creation time
-		Display_name  string      // Name of subreddit (only used with subreddit thing type)
-		Edited        interface{} // false or utc of last edit
-		Id            string      // unique indentifier for the thing
-		lastUpdate    float64     // after parsing, this will be the last modification time (usually created_utc)
-		Parent_id     string      // parent id of a comment
-		Replies       []thing     // replies to a comment
-		Selftext_html string      // html from a new post
-		Subreddit     string      // name of the subreddit associated with the thing
-		Subreddit_id  string      // id of the subreddit associated with the thing
-		Title         string      // title of the post
-		Url           string      // url of the post
+		Author        string          // name of the poster
+		Body_html     string          // html from a comment
+		Created_utc   float64         // utc of creation time
+		Display_name  string          // Name of subreddit (only used with subreddit thing type)
+		Edited        interface{}     // false or utc of last edit
+		Id            string          // unique indentifier for the thing
+		lastUpdate    float64         // after parsing, this will be the last modification time (usually created_utc)
+		Parent_id     string          // parent id of a comment
+		Replies       json.RawMessage // replies to a comment
+		Selftext_html string          // html from a new post
+		Subreddit     string          // name of the subreddit associated with the thing
+		Subreddit_id  string          // id of the subreddit associated with the thing
+		Title         string          // title of the post
+		Url           string          // url of the post
 	}
 }
 
@@ -94,14 +95,17 @@ func createNewThing(in thing) (Thing, error) {
 	subredditId := GlobalId{thingId, Subreddit}
 	parentId := GlobalId{}
 	if currentKind != Subreddit {
-		subredditId.Id, error = ParseId(in.Data.Subreddit_id)
+		subredditId, error = ParseGlobalId(in.Data.Subreddit_id)
 		if error != nil {
 			return Thing{}, errors.New("Unable to grok subreddit id: " + error.Error())
 		}
 
-		parentId, error = ParseGlobalId(in.Data.Parent_id)
-		if error != nil {
-			return Thing{}, errors.New("Unable to grok parent id: " + error.Error())
+		if len(in.Data.Parent_id) != 0 {
+
+			parentId, error = ParseGlobalId(in.Data.Parent_id)
+			if error != nil {
+				return Thing{}, errors.New("Unable to grok parent id: " + error.Error())
+			}
 		}
 	} else { // type subreddit
 		subredditName = in.Data.Display_name
@@ -110,16 +114,19 @@ func createNewThing(in thing) (Thing, error) {
 	//
 	// Cull through replies too
 	//
-	var newReplies []Thing
-	if in.Data.Replies != nil && len(in.Data.Replies) > 0 {
-		newReplies = make([]Thing, 0, len(in.Data.Replies))
+	var newReplies Groked
 
-		for _, reply := range in.Data.Replies {
-			newReply, error := createNewThing(reply)
+	// If reply field was present
+	if in.Data.Replies != nil && len(in.Data.Replies) > 0 {
+
+		// if reply field wasn't empty string
+		if in.Data.Replies[0] != '"' {
+			// gross! indirect recursion! easiest way for now
+			newReplies, error = GrokListing(bytes.NewReader(in.Data.Replies))
+
 			if error != nil {
 				return Thing{}, error
 			}
-			newReplies = append(newReplies, newReply)
 		}
 	}
 

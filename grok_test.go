@@ -427,45 +427,47 @@ func TestRedditPage(t *testing.T) {
 	expected.ListingNext = "t5_2qh03"
 	expected.Children = make([]Thing, 3)
 
-	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, nil, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
-	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201246556, GlobalId{}, nil, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
-	expected.Children[2] = Thing{"", 1190054605, GlobalId{4594323, Subreddit}, 1190054605, GlobalId{}, nil, "gaming", GlobalId{4594323, Subreddit}, "", "", "/r/gaming/"}
+	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, Groked{}, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
+	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201246556, GlobalId{}, Groked{}, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
+	expected.Children[2] = Thing{"", 1190054605, GlobalId{4594323, Subreddit}, 1190054605, GlobalId{}, Groked{}, "gaming", GlobalId{4594323, Subreddit}, "", "", "/r/gaming/"}
 
 	verifyGroked(t, expected, actual)
 }
-/*
+
 func TestSubredditPage(t *testing.T) {
-	groked, error := GrokObject(strings.NewReader(subreddit3Posts))
+	actual, error := GrokListing(strings.NewReader(subreddit3Posts))
 	if error != nil {
 		t.Error("Failed to parse object: " + error.Error())
 	}
 
-	expectedThings := make([]expectedThing, 0, 3)
-	expectedThings = append(expectedThings, expectedThing{LinkType, 40})
-	expectedThings = append(expectedThings, expectedThing{LinkType, 39})
-	expectedThings = append(expectedThings, expectedThing{LinkType, 39})
+	expected := Groked{}
+	expected.ListingNext = "t3_20d5ol"
+	expected.Children = make([]Thing, 3)
 
-	verifyGroked(t, groked, "", "t3_20d5ol", expectedThings)
+	expected.Children[0] = Thing{"reality_bugger", 1394831435, GlobalId{121660225, Link}, 1394831435, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>1</html>", "Just a short thank you.", "http://www.reddit.com/r/redditdev/comments/20flmp/just_a_short_thank_you/"}
+	expected.Children[1] = Thing{"Grimzentide", 1394793933, GlobalId{121593987, Link}, 1394793933, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>2</html>", "Is this the most efficient way to run this code?", "http://www.reddit.com/r/redditdev/comments/20e6ir/is_this_the_most_efficient_way_to_run_this_code/"}
+	expected.Children[2] = Thing{"amleszk", 1394758226, GlobalId{121546245, Link}, 1394758226, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>3</html>", "api/friend.json has no effect", "http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/"}
+
+	verifyGroked(t, expected, actual)
 }
 
 func TestCommentsPage(t *testing.T) {
 
-	groked, error := GrokArray(strings.NewReader(comments1Reply))
+	actual, error := GrokListingArray(strings.NewReader(comments1Reply))
 	if error != nil {
 		t.Error("Failed to parse array: " + error.Error())
 	}
 
-	if len(groked) != 2 {
-		t.Fatal("Expected 2 groked items")
-	}
+	assertEqual(t, len(actual), 2, "Groked array failure")
 
-	expectedThings := make([]expectedThing, 0, 1)
-	expectedThings = append(expectedThings, expectedThing{LinkType, 39})
+	expected := make([]Groked, 2)
+	expected[0].Children = make([]Thing, 1)
+	expected[0].Children[0] = Thing{"amleszk", 1394758226, GlobalId{121546245, Link}, 1394758226, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>", "api/friend.json has no effect", "http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/"}
 
-	verifyGroked(t, &groked[0], "", "", expectedThings)
+	expected[1].Children = make([]Thing, 1)
+	expected[1].Children[0] = Thing{"bsimpson", 1394804227, GlobalId{27092900622, Comment}, 1394804227, GlobalId{121546245, Link}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<body>", "", ""}
 
-	expectedThings[0].expectedType = CommentType
-	expectedThings[0].expectedFieldCount = 25
-	verifyGroked(t, &groked[1], "", "", expectedThings)
+
+	verifyGroked(t, expected[0], actual[0])
+	verifyGroked(t, expected[1], actual[1])
 }
-*/

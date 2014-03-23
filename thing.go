@@ -6,7 +6,7 @@ type Thing struct {
 	Id          GlobalId // uniquely indentifies the thing
 	LastUpdate  int64    // utc of last update
 	ParentId    GlobalId // parent id of a comment
-	Replies     []Thing  // unparsed replies to a comment
+	Replies     Groked   // replies to a comment
 	Subreddit   string   // name of the subreddit associated with the thing
 	SubredditId GlobalId // uniquely identifies the subreddit associated with the thing
 	Text_html   string   // html from post

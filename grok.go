@@ -9,9 +9,9 @@ import (
 )
 
 type Groked struct {
-	ListingPrev string  // Indicates thing before this listing (if listing was groked)
-	ListingNext string  // Indicates thing after this listing (if listing was groked)
-	Children    []Thing // Children things to the listing, or the single thing groked
+	ListingPrev *GlobalId // Indicates thing before this listing (if listing was groked)
+	ListingNext *GlobalId // Indicates thing after this listing (if listing was groked)
+	Children    []Thing   // Children things to the listing, or the single thing groked
 }
 
 type thing struct {
@@ -137,8 +137,24 @@ func internalGrok(parsedListing listing) (Groked, error) {
 	groked := Groked{}
 
 	groked.Children = make([]Thing, 0, len(parsedListing.Data.Children))
-	groked.ListingPrev = parsedListing.Data.Before
-	groked.ListingNext = parsedListing.Data.After
+
+	if len(parsedListing.Data.Before) > 0 {
+		previousListing, error := ParseGlobalId(parsedListing.Data.Before)
+		if error != nil {
+			return groked, errors.New("Invalid previous listing value: " + error.Error())
+		}
+		
+		groked.ListingPrev = &previousListing
+	}
+
+	if len(parsedListing.Data.After) > 0 {
+		nextListing, error := ParseGlobalId(parsedListing.Data.After)
+		if error != nil {
+			return groked, errors.New("Invalid next listing value: " + error.Error())
+		}
+
+		groked.ListingNext = &nextListing
+	}
 
 	for _, element := range parsedListing.Data.Children {
 

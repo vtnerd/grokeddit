@@ -123,7 +123,7 @@ const (
             }
         ],
         "after": "t5_2qh03",
-        "before": "blah blah made up"
+        "before": "t5_2qh00"
     }
 }
 `
@@ -746,8 +746,8 @@ func TestRedditPage(t *testing.T) {
 
 	expected := Groked{}
 
-	expected.ListingPrev = "blah blah made up"
-	expected.ListingNext = "t5_2qh03"
+	expected.ListingPrev = &GlobalId{4594320, Subreddit}
+	expected.ListingNext = &GlobalId{4594323, Subreddit}
 	expected.Children = make([]Thing, 3)
 
 	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, Groked{}, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
@@ -764,7 +764,7 @@ func TestSubredditPage(t *testing.T) {
 	}
 
 	expected := Groked{}
-	expected.ListingNext = "t3_20d5ol"
+	expected.ListingNext = &GlobalId{121546245, Link}
 	expected.Children = make([]Thing, 3)
 
 	expected.Children[0] = Thing{"reality_bugger", 1394831435, GlobalId{121660225, Link}, 1394831435, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>1</html>", "Just a short thank you.", "http://www.reddit.com/r/redditdev/comments/20flmp/just_a_short_thank_you/"}
@@ -810,17 +810,17 @@ func TestCommentTree(t *testing.T) {
 	expected[1].Children = make([]Thing, 1)
 	expected[1].Children[0] = Thing{"inderstube", 1395579312, GlobalId{27105168651, Comment}, 1395579312, GlobalId{122815432, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>random comment in comment tree</html>", "", ""}
 
-	expected[1].Children[0].Replies.ListingNext = "t5_2qh03"
+	expected[1].Children[0].Replies.ListingNext = &GlobalId{4594323, Subreddit}
 	expected[1].Children[0].Replies.Children = make([]Thing, 2)
 	expected[1].Children[0].Replies.Children[0] = Thing{"PM_ME_YOUR_NIGHTMARE", 1395581581, GlobalId{27105190329, Comment}, 1395581581, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to comment</html>", "", ""}
 	expected[1].Children[0].Replies.Children[1] = Thing{"Dave37", 1395583919, GlobalId{27105216836, Comment}, 1395583919, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>second reply to comment</html>", "", ""}
 
-	expected[1].Children[0].Replies.Children[1].Replies.ListingPrev = "t5_2qh04"
+	expected[1].Children[0].Replies.Children[1].Replies.ListingPrev = &GlobalId{4594324, Subreddit}
 	expected[1].Children[0].Replies.Children[1].Replies.Children = make([]Thing, 1)
 	expected[1].Children[0].Replies.Children[1].Replies.Children[0] = Thing{"inderstube", 1395587709, GlobalId{27105270889, Comment}, 1395587709, GlobalId{27105216836, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to second comment</html>", "", ""}
 
 	verifyGroked(t, expected[0], actual[0])
-	verifyGroked(t, expected[1], actual[1])
+	verifyGroked(t, expected[1], actual[1]) 
 }
 
 func TestCommentListing(t *testing.T) {
@@ -831,8 +831,7 @@ func TestCommentListing(t *testing.T) {
 	}
 
 	expected := Groked{}
-	expected.ListingPrev = ""
-	expected.ListingNext = "t1_cg9tdui"
+	expected.ListingNext = &GlobalId{27105334362, Comment}
 	expected.Children = make([]Thing, 3)
 	expected.Children[0] = Thing{"babeltoothe", 1395591531, GlobalId{27105336444, Comment}, 1395591531, GlobalId{27105278179, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 1</html>", "", ""}
 	expected.Children[1] = Thing{"Apiphilia", 1395591442, GlobalId{27105334872, Comment}, 1395591442, GlobalId{122849489, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 2</html>", "", ""}

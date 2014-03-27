@@ -88,3 +88,17 @@ func (subreddit Subreddit) FetchControversialLinks(anchor *AnchorPoint) (Links, 
 	return subreddit.fetchLinks("controversial", anchor)
 }
 
+func (subreddit Subreddit) FetchComments(anchor *AnchorPoint) (Comments, error) {
+	path, error := subreddit.getPath("comments")
+	if error != nil {
+		return Comments{}, error
+	}
+
+	thingList, error := fetchThingList(path.FetchGrokedListing, anchor)
+	if error != nil {
+		return Comments{}, error
+	}
+	
+	// fetchComments is in comments.go
+	return fetchComments(thingList), nil 
+}

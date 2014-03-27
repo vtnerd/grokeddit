@@ -182,24 +182,22 @@ func GrokListing(dataSource io.Reader) (Groked, error) {
 }
 
 func GrokListingArray(dataSource io.Reader) ([]Groked, error) {
-	var parsedData []listing
-
 	var grokList []Groked
-
+	var parsedData []listing
 	if error := json.NewDecoder(dataSource).Decode(&parsedData); error != nil && error != io.EOF {
 		return grokList, errors.New("Unable to grok reddit JSON array: " + error.Error())
 	}
 
-	grokList = make([]Groked, 0, len(parsedData))
+	grokList = make([]Groked, len(parsedData))
 
-	for _, parsedListing := range parsedData {
+	for index, parsedListing := range parsedData {
 		newGrok, error := internalGrok(parsedListing)
 
 		if error != nil {
 			return grokList, error
 		}
 
-		grokList = append(grokList, newGrok)
+		grokList[index] = newGrok
 	}
 
 	return grokList, nil

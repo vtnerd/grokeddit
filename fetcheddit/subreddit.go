@@ -1,6 +1,7 @@
 package fetcheddit
 
 import (
+	"code.leeclagett.com/grokeddit"
 	"errors"
 	"net/url"
 	"strings"
@@ -33,6 +34,11 @@ func (subreddit Subreddit) getPath(filter string) (Path, error) {
 }
 
 func (subreddit Subreddit) fetchLinks(filter string, anchor *AnchorPoint) (Links, error) {
+	if anchor != nil {
+		if anchor.Anchor.Kind != grokeddit.Link {
+			return Links{}, errors.New("Anchor point must be a link")
+		}
+	}
 
 	path, error := subreddit.getPath(filter)
 	if error != nil {
@@ -89,6 +95,12 @@ func (subreddit Subreddit) FetchControversialLinks(anchor *AnchorPoint) (Links, 
 }
 
 func (subreddit Subreddit) FetchComments(anchor *AnchorPoint) (Comments, error) {
+	if anchor != nil {
+		if anchor.Anchor.Kind != grokeddit.Comment {
+			return Comments{}, errors.New("Anchor point must be a comment")
+		}
+	}
+
 	path, error := subreddit.getPath("comments")
 	if error != nil {
 		return Comments{}, error

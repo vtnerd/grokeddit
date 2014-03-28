@@ -11,10 +11,17 @@ type thingIterater interface {
 	getNext() (grokeddit.Thing, error)
 }
 
+type nextChunk struct {
+	nextThings     []grokeddit.Thing
+	moreThings     bool
+	retrievalError error
+}
+
 type thingList struct {
-	fetchMoreThings func() ([]grokeddit.Thing, bool, error)
-	currentThings   thingIterater // An abstraction for iterating over the current slice of Thing objects. Implementations can change the order of iterating.
-	moreThings      bool          // The last value returned by fetchMoreThings
+	fetchMoreThings   func() ([]grokeddit.Thing, bool, error)
+	currentThings     thingIterater // An abstraction for iterating over the current slice of Thing objects. Implementations can change the order of iterating.
+	moreThings        bool          // The last value returned by fetchMoreThings
+	chunkChannel chan nextChunk
 }
 
 func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, error), anchor *AnchorPoint) (thingList, error) {
@@ -56,10 +63,10 @@ func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, err
 				return nil, false, error
 			}
 
-			// There is a bug on the reddit side, the "before" 
-			// field is always NULL with a before request. This is 
+			// There is a bug on the reddit side, the "before"
+			// field is always NULL with a before request. This is
 			// solved with a hack that will do 1 extra request
-			// than necessary, the additional traffic is on you 
+			// than necessary, the additional traffic is on you
 			// reddit.
 			more := false
 			if newGroked.Children != nil && len(newGroked.Children) > 0 {
@@ -77,7 +84,16 @@ func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, err
 	}
 
 	currentThingIterater.setArray(firstThings)
-	return thingList{fetchMore, currentThingIterater, moreThings}, nil
+	newThingList := thingList{fetchMore, currentThingIterater, moreThings, make(chan nextChunk)}
+	newThingList.fetchNextBlockAsync()
+	return newThingList, nil
+}
+
+func (list *thingList) fetchNextBlockAsync() {
+	go func() {
+		nextThings, moreThings, error := list.fetchMoreThings()
+		list.chunkChannel <- nextChunk{nextThings, moreThings, error}
+	}()
 }
 
 func (list *thingList) hasNext() bool {
@@ -90,14 +106,18 @@ func (list *thingList) getNext() (grokeddit.Thing, error) {
 	}
 
 	if !list.currentThings.hasNext() {
-		nextThings, moreThings, error := list.fetchMoreThings()
+		nextChunk := <- list.chunkChannel
 
-		if error != nil {
-			return grokeddit.Thing{}, errors.New("Unable to fetch more things: " + error.Error())
+		if nextChunk.moreThings {
+			list.fetchNextBlockAsync()
 		}
 
-		list.moreThings = moreThings
-		list.currentThings.setArray(nextThings)
+		if nextChunk.retrievalError != nil {
+			return grokeddit.Thing{}, errors.New("Unable to fetch more things: " + nextChunk.retrievalError.Error())
+		}
+
+		list.moreThings = nextChunk.moreThings
+		list.currentThings.setArray(nextChunk.nextThings)
 	}
 
 	return list.currentThings.getNext()

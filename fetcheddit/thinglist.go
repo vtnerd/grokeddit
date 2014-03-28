@@ -85,7 +85,10 @@ func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, err
 
 	currentThingIterater.setArray(firstThings)
 	newThingList := thingList{fetchMore, currentThingIterater, moreThings, make(chan nextChunk)}
-	newThingList.fetchNextBlockAsync()
+
+	if moreThings {
+		newThingList.fetchNextBlockAsync()
+	}
 	return newThingList, nil
 }
 

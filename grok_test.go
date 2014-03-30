@@ -718,23 +718,23 @@ func verifyGroked(t *testing.T, expected Groked, actual Groked) {
 	expectEqual(t, expected.ListingPrev, actual.ListingPrev, "Previous listing error")
 	expectEqual(t, expected.ListingNext, actual.ListingNext, "Next listing error")
 	assertEqual(t, len(expected.Children), len(actual.Children), "Number of children error")
-	
+
 	for index, expectedThing := range expected.Children {
 		errorMessage := " error at child index " + strconv.Itoa(index)
-		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author" +errorMessage)
-		expectEqual(t, expectedThing.CreatedUtc, actual.Children[index].CreatedUtc, "Created timestamp" + errorMessage)
-		expectEqual(t, expectedThing.Id, actual.Children[index].Id, "id" + errorMessage)
-		expectEqual(t, expectedThing.LastUpdateUtc, actual.Children[index].LastUpdateUtc, "Last update timestamp" + errorMessage)
-		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "parent id" + errorMessage)
+		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author"+errorMessage)
+		expectEqual(t, expectedThing.CreatedUtc, actual.Children[index].CreatedUtc, "Created timestamp"+errorMessage)
+		expectEqual(t, expectedThing.Id, actual.Children[index].Id, "id"+errorMessage)
+		expectEqual(t, expectedThing.LastUpdateUtc, actual.Children[index].LastUpdateUtc, "Last update timestamp"+errorMessage)
+		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "parent id"+errorMessage)
 
 		// recursively check replies
 		verifyGroked(t, expectedThing.Replies, actual.Children[index].Replies)
 
-		expectEqual(t, expectedThing.Subreddit, actual.Children[index].Subreddit, "Subreddit name" + errorMessage)
-		expectEqual(t, expectedThing.SubredditId, actual.Children[index].SubredditId, "Subreddit id" + errorMessage)
-		expectEqual(t, expectedThing.Text_html, actual.Children[index].Text_html, "Text html" + errorMessage)
-		expectEqual(t, expectedThing.Title, actual.Children[index].Title, "Title" + errorMessage)
-		expectEqual(t, expectedThing.Url, actual.Children[index].Url, "Url" + errorMessage)
+		expectEqual(t, expectedThing.Subreddit, actual.Children[index].Subreddit, "Subreddit name"+errorMessage)
+		expectEqual(t, expectedThing.SubredditId, actual.Children[index].SubredditId, "Subreddit id"+errorMessage)
+		expectEqual(t, expectedThing.Text_html, actual.Children[index].Text_html, "Text html"+errorMessage)
+		expectEqual(t, expectedThing.Title, actual.Children[index].Title, "Title"+errorMessage)
+		expectEqual(t, expectedThing.Url, actual.Children[index].Url, "Url"+errorMessage)
 	}
 }
 
@@ -744,15 +744,51 @@ func TestRedditPage(t *testing.T) {
 		t.Error("Failed to parse listing: " + error.Error())
 	}
 
-	expected := Groked{}
-
-	expected.ListingPrev = &GlobalId{4594320, Subreddit}
-	expected.ListingNext = &GlobalId{4594323, Subreddit}
-	expected.Children = make([]Thing, 3)
-
-	expected.Children[0] = Thing{"", 1201221069, GlobalId{4594350, Subreddit}, 1201221069, GlobalId{}, Groked{}, "pics", GlobalId{4594350, Subreddit}, "", "/r/Pics", "/r/pics/"}
-	expected.Children[1] = Thing{"", 1201242956, GlobalId{4594431, Subreddit}, 1201242956, GlobalId{}, Groked{}, "funny", GlobalId{4594431, Subreddit}, "", "funny", "/r/funny/"}
-	expected.Children[2] = Thing{"", 1190054605, GlobalId{4594323, Subreddit}, 1190054605, GlobalId{}, Groked{}, "gaming", GlobalId{4594323, Subreddit}, "", "", "/r/gaming/"}
+	expected := Groked{
+		&GlobalId{4594320, Subreddit},
+		&GlobalId{4594323, Subreddit},
+		[]Thing{
+			Thing{
+				"", 
+				1201221069, 
+				GlobalId{4594350, Subreddit}, 
+				1201221069, 
+				GlobalId{}, 
+				Groked{}, 
+				"pics", 
+				GlobalId{4594350, Subreddit}, 
+				"", 
+				"/r/Pics", 
+				"/r/pics/",
+			},
+			Thing{
+				"", 
+				1201242956, 
+				GlobalId{4594431, Subreddit}, 
+				1201242956, 
+				GlobalId{}, 
+				Groked{}, 
+				"funny", 
+				GlobalId{4594431, Subreddit}, 
+				"", 
+				"funny", 
+				"/r/funny/",
+			},
+			Thing{
+				"", 
+				1190054605, 
+				GlobalId{4594323, Subreddit}, 
+				1190054605, 
+				GlobalId{}, 
+				Groked{}, 
+				"gaming", 
+				GlobalId{4594323, Subreddit}, 
+				"", 
+				"", 
+				"/r/gaming/",
+			},
+		},
+	}
 
 	verifyGroked(t, expected, actual)
 }
@@ -763,13 +799,49 @@ func TestSubredditPage(t *testing.T) {
 		t.Error("Failed to parse object: " + error.Error())
 	}
 
-	expected := Groked{}
-	expected.ListingNext = &GlobalId{121546245, Link}
-	expected.Children = make([]Thing, 3)
-
-	expected.Children[0] = Thing{"reality_bugger", 1394831435, GlobalId{121660225, Link}, 1394831435, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>1</html>", "Just a short thank you.", "http://www.reddit.com/r/redditdev/comments/20flmp/just_a_short_thank_you/"}
-	expected.Children[1] = Thing{"Grimzentide", 1394793933, GlobalId{121593987, Link}, 1394793933, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>2</html>", "Is this the most efficient way to run this code?", "http://www.reddit.com/r/redditdev/comments/20e6ir/is_this_the_most_efficient_way_to_run_this_code/"}
-	expected.Children[2] = Thing{"amleszk", 1394758226, GlobalId{121546245, Link}, 1394758226, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>3</html>", "api/friend.json has no effect", "http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/"}
+	expected := Groked{
+		nil,
+		&GlobalId{121546245, Link},
+		[]Thing{
+			Thing{
+				"reality_bugger", 
+				1394831435, 
+				GlobalId{121660225, Link}, 
+				1394831435, 
+				GlobalId{}, 
+				Groked{}, 
+				"redditdev", 
+				GlobalId{4596889, Subreddit}, 
+				"<html>1</html>", 
+				"Just a short thank you.", 
+				"http://www.reddit.com/r/redditdev/comments/20flmp/just_a_short_thank_you/",
+			},
+			Thing{
+				"Grimzentide", 
+				1394793933, 
+				GlobalId{121593987, Link}, 1394793933, 
+				GlobalId{}, 
+				Groked{}, 
+				"redditdev", 
+				GlobalId{4596889, Subreddit}, 
+				"<html>2</html>", 
+				"Is this the most efficient way to run this code?", 
+				"http://www.reddit.com/r/redditdev/comments/20e6ir/is_this_the_most_efficient_way_to_run_this_code/",
+			},
+			Thing{
+				"amleszk", 
+				1394758226, 
+				GlobalId{121546245, Link}, 
+				1394758226,
+				GlobalId{},
+				Groked{}, 
+				"redditdev", 
+				GlobalId{4596889, Subreddit},
+				"<html>3</html>", 
+				"api/friend.json has no effect", "http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/",
+			},
+		},
+	}
 
 	verifyGroked(t, expected, actual)
 }
@@ -783,13 +855,46 @@ func TestCommentsPageWith1Comment(t *testing.T) {
 
 	assertEqual(t, len(actual), 2, "Groked array failure")
 
-	expected := make([]Groked, 2)
-	expected[0].Children = make([]Thing, 1)
-	expected[0].Children[0] = Thing{"amleszk", 1394758226, GlobalId{121546245, Link}, 1394758226, GlobalId{}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<html>", "api/friend.json has no effect", "http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/"}
-
-	expected[1].Children = make([]Thing, 1)
-	expected[1].Children[0] = Thing{"bsimpson", 1394804227, GlobalId{27092900622, Comment}, 1394804227, GlobalId{121546245, Link}, Groked{}, "redditdev", GlobalId{4596889, Subreddit}, "<body>", "", ""}
-
+	expected := []Groked {
+		Groked{
+			nil,
+			nil,
+			[]Thing{
+				Thing{
+					"amleszk", 
+					1394758226, 
+					GlobalId{121546245, Link}, 
+					1394758226, 
+					GlobalId{}, 
+					Groked{}, 
+					"redditdev",
+					GlobalId{4596889, Subreddit}, 
+					"<html>",
+					"api/friend.json has no effect",
+					"http://www.reddit.com/r/redditdev/comments/20d5ol/apifriendjson_has_no_effect/",
+				},
+			},
+		},
+		Groked{
+			nil,
+			nil,
+			[]Thing{
+				Thing{
+					"bsimpson", 
+					1394804227, 
+					GlobalId{27092900622, Comment}, 
+					1394804227,
+					GlobalId{121546245, Link},
+					Groked{}, 
+					"redditdev",
+					GlobalId{4596889, Subreddit},
+					"<body>", 
+					"", 
+					"",
+				},
+			},
+		},
+	}
 
 	verifyGroked(t, expected[0], actual[0])
 	verifyGroked(t, expected[1], actual[1])
@@ -803,24 +908,98 @@ func TestCommentTree(t *testing.T) {
 
 	assertEqual(t, len(actual), 2, "Groked array failure")
 
-	expected := make([]Groked, 2)
-	expected[0].Children = make([]Thing, 1)
-	expected[0].Children[0] = Thing{"drumersrule", 1395541589, GlobalId{122815432, Link}, 1395541589, GlobalId{}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>og link text</html>", "Do offspring ever take care of their parents in other species?", "http://www.reddit.com/r/askscience/comments/214czs/do_offspring_ever_take_care_of_their_parents_in/"}
-
-	expected[1].Children = make([]Thing, 1)
-	expected[1].Children[0] = Thing{"inderstube", 1395579312, GlobalId{27105168651, Comment}, 1395579312, GlobalId{122815432, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>random comment in comment tree</html>", "", ""}
-
-	expected[1].Children[0].Replies.ListingNext = &GlobalId{4594323, Subreddit}
-	expected[1].Children[0].Replies.Children = make([]Thing, 2)
-	expected[1].Children[0].Replies.Children[0] = Thing{"PM_ME_YOUR_NIGHTMARE", 1395581581, GlobalId{27105190329, Comment}, 1395581581, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to comment</html>", "", ""}
-	expected[1].Children[0].Replies.Children[1] = Thing{"Dave37", 1395583919, GlobalId{27105216836, Comment}, 1395583919, GlobalId{27105168651, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>second reply to comment</html>", "", ""}
-
-	expected[1].Children[0].Replies.Children[1].Replies.ListingPrev = &GlobalId{4594324, Subreddit}
-	expected[1].Children[0].Replies.Children[1].Replies.Children = make([]Thing, 1)
-	expected[1].Children[0].Replies.Children[1].Replies.Children[0] = Thing{"inderstube", 1395587709, GlobalId{27105270889, Comment}, 1395587709, GlobalId{27105216836, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>first reply to second comment</html>", "", ""}
+	expected := []Groked{
+		Groked{
+			nil,
+			nil,
+			[]Thing{
+				Thing{
+					"drumersrule", 
+					1395541589, 
+					GlobalId{122815432, Link}, 
+					1395541589, 
+					GlobalId{}, 
+					Groked{}, 
+					"askscience", 
+					GlobalId{4600958, Subreddit}, 
+					"<html>og link text</html>", 
+					"Do offspring ever take care of their parents in other species?", 
+					"http://www.reddit.com/r/askscience/comments/214czs/do_offspring_ever_take_care_of_their_parents_in/",
+				},
+			},
+		},
+		Groked{
+			nil,
+			nil,
+			[]Thing {
+				Thing{
+					"inderstube", 
+					1395579312, 
+					GlobalId{27105168651, Comment}, 
+					1395579312, 
+					GlobalId{122815432, Link}, 
+					Groked{
+						nil,
+						&GlobalId{4594323, Subreddit},
+						[]Thing{
+							Thing{
+								"PM_ME_YOUR_NIGHTMARE", 
+								1395581581, 
+								GlobalId{27105190329, Comment}, 
+								1395581581, 
+								GlobalId{27105168651, Comment}, 
+								Groked{}, 
+								"askscience", 
+								GlobalId{4600958, Subreddit}, 
+								"<html>first reply to comment</html>", 
+								"", 
+								"",
+							},
+							Thing{
+								"Dave37", 
+								1395583919, 
+								GlobalId{27105216836, Comment}, 
+								1395583919, 
+								GlobalId{27105168651, Comment}, 
+								Groked{
+									&GlobalId{4594324, Subreddit},
+									nil,
+									[]Thing{
+										Thing{
+											"inderstube", 
+											1395587709, 
+											GlobalId{27105270889, Comment}, 
+											1395587709, 
+											GlobalId{27105216836, Comment}, 
+											Groked{}, 
+											"askscience", 
+											GlobalId{4600958, Subreddit}, 
+											"<html>first reply to second comment</html>", 
+											"", 
+											"",
+										},
+									},
+								}, 
+								"askscience", 
+								GlobalId{4600958, Subreddit}, 
+								"<html>second reply to comment</html>", 
+								"", 
+								"",
+							},
+						},
+					}, 
+					"askscience", 
+					GlobalId{4600958, Subreddit}, 
+					"<html>random comment in comment tree</html>", 
+					"", 
+					"",
+				},
+			},
+		},
+	}
 
 	verifyGroked(t, expected[0], actual[0])
-	verifyGroked(t, expected[1], actual[1]) 
+	verifyGroked(t, expected[1], actual[1])
 }
 
 func TestCommentListing(t *testing.T) {
@@ -830,12 +1009,51 @@ func TestCommentListing(t *testing.T) {
 		t.Error("Failed to parse array: " + error.Error())
 	}
 
-	expected := Groked{}
-	expected.ListingNext = &GlobalId{27105334362, Comment}
-	expected.Children = make([]Thing, 3)
-	expected.Children[0] = Thing{"babeltoothe", 1395591531, GlobalId{27105336444, Comment}, 1395591531, GlobalId{27105278179, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 1</html>", "", ""}
-	expected.Children[1] = Thing{"Apiphilia", 1395591442, GlobalId{27105334872, Comment}, 1395591442, GlobalId{122849489, Link}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 2</html>", "", ""}
-	expected.Children[2] = Thing{"AlexxTheKid", 1395591414, GlobalId{27105334362, Comment}, 1395591414, GlobalId{27105031064, Comment}, Groked{}, "askscience", GlobalId{4600958, Subreddit}, "<html>comment 3</html>", "", ""}
+	expected := Groked{
+		nil,
+		&GlobalId{27105334362, Comment},
+		[]Thing{
+			Thing{
+				"babeltoothe", 
+				1395591531, 
+				GlobalId{27105336444, Comment}, 
+				1395591531, 
+				GlobalId{27105278179, Comment}, 
+				Groked{}, 
+				"askscience", 
+				GlobalId{4600958, Subreddit}, 
+				"<html>comment 1</html>", 
+				"", 
+				"",
+			},
+			Thing{
+				"Apiphilia", 
+				1395591442, 
+				GlobalId{27105334872, Comment}, 
+				1395591442, 
+				GlobalId{122849489, Link}, 
+				Groked{}, 
+				"askscience", 
+				GlobalId{4600958, Subreddit}, 
+				"<html>comment 2</html>", 
+				"", 
+				"",
+			},
+			Thing{
+				"AlexxTheKid", 
+				1395591414, 
+				GlobalId{27105334362, Comment}, 
+				1395591414, 
+				GlobalId{27105031064, Comment}, 
+				Groked{}, 
+				"askscience", 
+				GlobalId{4600958, Subreddit}, 
+				"<html>comment 3</html>", 
+				"", 
+				"",
+			},
+		},
+	}
 
 	verifyGroked(t, expected, actual)
 }

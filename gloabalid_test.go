@@ -23,8 +23,8 @@ func TestParseInvalidGobalId(t *testing.T) {
 func TestParseValidGlobalId(t *testing.T) {
 
 	validInputs := []struct {
-		input string
-		expected GlobalId
+		redditVersion string
+		internalVersion GlobalId
 	}{
 		{"t1_blah", GlobalId{540809, Comment}},
 		{"t3_blbh", GlobalId{540845, Link}},
@@ -32,18 +32,30 @@ func TestParseValidGlobalId(t *testing.T) {
 	}
 
 	for _, validInput := range validInputs {
-		result, error := ParseGlobalId(validInput.input)
+		internalResult, error := ParseGlobalId(validInput.redditVersion)
 
 		if error != nil {
-			t.Fatalf("Did not expect error with input \"%s\"", validInput)
+			t.Fatalf("Did not expect error with input \"%s\"", validInput.redditVersion)
 		}
 
-		if validInput.expected.Kind != result.Kind {
-			t.Errorf("Expected type %d but got %d", validInput.expected.Kind, result.Kind)
+		if validInput.internalVersion.Kind != internalResult.Kind {
+			t.Errorf("Expected type %d but got %d", 
+				validInput.internalVersion.Kind, 
+				internalResult.Kind)
 		}
 
-		if validInput.expected.Id != result.Id {
-			t.Errorf("Expected id %d but got %d", validInput.expected.Id, result.Id)
+		if validInput.internalVersion.Id != internalResult.Id {
+			t.Errorf("Expected id %d but got %d", 
+				validInput.internalVersion.Id, 
+				internalResult.Id)
+		}
+
+		externalResult := validInput.internalVersion.String()
+
+		if externalResult != validInput.redditVersion {
+			t.Errorf("Expected \"%s\" but got \"%s\"", 
+				validInput.redditVersion, 
+				externalResult)
 		}
 	}
 }

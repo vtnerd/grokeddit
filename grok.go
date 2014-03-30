@@ -23,7 +23,6 @@ type thing struct {
 		Display_name  string          // Name of subreddit (only used with subreddit thing type)
 		Edited        interface{}     // false or utc of last edit
 		Id            string          // unique indentifier for the thing
-		lastUpdate    float64         // after parsing, this will be the last modification time (usually created_utc)
 		Parent_id     string          // parent id of a comment
 		Replies       json.RawMessage // replies to a comment
 		Selftext_html string          // html from a new post

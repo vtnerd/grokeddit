@@ -1,61 +1,53 @@
 package grokeddit
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestInvalidThingIdParsing(t *testing.T) {
-	_, error := ParseId("")
-	if error == nil {
-		t.Error("Empty string is not a valid id")
+	invalidInputs := []string {
+		"",
+		"blah ",
 	}
+	
+	for _, invalidInput := range invalidInputs {
+		_, error := ParseId(invalidInput)
 
-	_, error = ParseId("blah ")
-	if error == nil {
-		t.Error("blah is not a valid id")
+		if error == nil {
+			t.Errorf("Expected error for input \"%s\"", invalidInput)
+		}
 	}
 }
 
 func TestValidThingIdParsing(t *testing.T) {
-	testId, error := ParseId("20ko77")
-	if error != nil {
-		t.Error("unexpected error when parsing id")
+
+	validInputs := []struct {
+		externalValue string
+		internalValue ThingId
+	}{
+		{"20ko77", ThingId(121896835)},
+		{"0", ThingId(0)},
+		{"3W5E11264SGSF", ThingId(^uint64(0))},
 	}
 
-	if testId != 121896835 {
-		t.Error("Improper base36 decoding")
-	}
+	for _, validInput := range validInputs {
+		internalResult, error := ParseId(validInput.externalValue)
 
-	testId, error = ParseId("0")
-	if error != nil {
-		t.Error("unexpected error when parsing id")
-	}
+		if error != nil {
+			t.Fatalf("Unexpected error for input \"%s\"", validInput.externalValue)
+		}
 
-	if testId != 0 {
-		t.Error("Improper base36 decoding")
-	}
+		if internalResult != validInput.internalValue {
+			t.Errorf("Expected value %d but got %d", validInput.internalValue, internalResult)
+		}
 
-	testId, error = ParseId("3W5E11264SGSF")
-	if error != nil {
-		t.Error("unexpected error when parsing id")
-	}
-
-	if testId != ThingId(^uint64(0)) {
-		t.Error("Improper base36 decoding")
+		externalResult := validInput.internalValue.String()
+		if externalResult != strings.ToLower(validInput.externalValue) {
+			t.Errorf("Expected value \"%s\" but got \"%s\"", 
+				strings.ToLower(validInput.externalValue), 
+				externalResult)
+		}
 	}
 }
 
-func TestThingIdToString(t *testing.T) {
-	testString := ThingId(121896835).String()
-	if testString != "20ko77" {
-		t.Error("Expected 20ko77 but got " + testString)
-	}
-
-	testString = ThingId(0).String()
-	if testString != "0" {
-		t.Error("Expected 0 but got " + testString)
-	}
-
-	testString = ThingId(^uint64(0)).String()
-	if testString != "3w5e11264sgsf" {
-		t.Error("Expected 3w5E11264sgsf but got " + testString)
-	}
-}

@@ -722,9 +722,9 @@ func verifyGroked(t *testing.T, expected Groked, actual Groked) {
 	for index, expectedThing := range expected.Children {
 		errorMessage := " error at child index " + strconv.Itoa(index)
 		expectEqual(t, expectedThing.Author, actual.Children[index].Author, "Author" +errorMessage)
-		expectEqual(t, expectedThing.Created_utc, actual.Children[index].Created_utc, "Created timestamp" + errorMessage)
+		expectEqual(t, expectedThing.CreatedUtc, actual.Children[index].CreatedUtc, "Created timestamp" + errorMessage)
 		expectEqual(t, expectedThing.Id, actual.Children[index].Id, "id" + errorMessage)
-		expectEqual(t, expectedThing.LastUpdate, actual.Children[index].LastUpdate, "Last update timestamp" + errorMessage)
+		expectEqual(t, expectedThing.LastUpdateUtc, actual.Children[index].LastUpdateUtc, "Last update timestamp" + errorMessage)
 		expectEqual(t, expectedThing.ParentId, actual.Children[index].ParentId, "parent id" + errorMessage)
 
 		// recursively check replies

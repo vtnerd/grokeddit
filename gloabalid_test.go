@@ -4,65 +4,46 @@ import "testing"
 
 func TestParseInvalidGobalId(t *testing.T) {
 
-	_, error := ParseGlobalId("")
-	if error == nil {
-		t.Error("Expected error when parsing \"\" for global id")
+	invalidInputs := []string {
+		"",
+		"t2_blah", // t2 unsupported
+		"t3blah", 
+		"t3_blah ",
 	}
+	
+	for _, invalidInput := range invalidInputs {
+		_, error := ParseGlobalId(invalidInput)
 
-	_, error = ParseGlobalId("t2_blah") // t2 unsupported
-	if error == nil {
-		t.Error("Expected error when parsing \"t2_blah\" global id")
-	}
-
-	_, error = ParseGlobalId("t3blah")
-	if error == nil {
-		t.Error("Expected error when parsing \"t2blag\" global id")
-	}
-
-	_, error = ParseGlobalId("t3_blah ") // space unsupported
-	if error == nil {
-		t.Error("Expected error when parsing \"t3_blah \" global id")
+		if error == nil {
+			t.Errorf("Expected error when parsing \"%s\"", invalidInput)
+		}
 	}
 }
 
 func TestParseValidGlobalId(t *testing.T) {
 
-	testId, error := ParseGlobalId("t1_blah")
-	if error != nil {
-		t.Error("Unexpected error when parsing global id \"t1_blah\": " + error.Error())
+	validInputs := []struct {
+		input string
+		expected GlobalId
+	}{
+		{"t1_blah", GlobalId{540809, Comment}},
+		{"t3_blbh", GlobalId{540845, Link}},
+		{"t5_blai", GlobalId{540810, Subreddit}},
 	}
 
-	if testId.Id != 540809 {
-		t.Error("Expected 540809 for the id value")
-	}
+	for _, validInput := range validInputs {
+		result, error := ParseGlobalId(validInput.input)
 
-	if testId.Kind != Comment {
-		t.Error("Expected kind to be comment")
-	}
+		if error != nil {
+			t.Fatalf("Did not expect error with input \"%s\"", validInput)
+		}
 
-	testId, error = ParseGlobalId("t3_blah")
-	if error != nil {
-		t.Error("Unexpected error when parsing global id \"t3_blah\": " + error.Error())
-	}
+		if validInput.expected.Kind != result.Kind {
+			t.Errorf("Expected type %d but got %d", validInput.expected.Kind, result.Kind)
+		}
 
-	if testId.Id != 540809 {
-		t.Error("Expected 540809 for the id value")
-	}
-
-	if testId.Kind != Link {
-		t.Error("Expected kind to be link")
-	}
-
-	testId, error = ParseGlobalId("t5_blah")
-	if error != nil {
-		t.Error("Unexpected error when parsing global id \"t5_blah\": " + error.Error())
-	}
-
-	if testId.Id != 540809 {
-		t.Error("Expected 540809 for the id value")
-	}
-
-	if testId.Kind != Subreddit {
-		t.Error("Expected kind to be subreddit")
+		if validInput.expected.Id != result.Id {
+			t.Errorf("Expected id %d but got %d", validInput.expected.Id, result.Id)
+		}
 	}
 }

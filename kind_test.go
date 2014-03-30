@@ -3,64 +3,47 @@ package grokeddit
 import "testing"
 
 func TestParsingInvalidKinds(t *testing.T) {
-	_, error := ParseKind("t2")
-	if error == nil {
-		t.Error("t2 is not a valid kind (yet)")
+	invalidInputs := []string {
+		"t2",
+		"",
+		"no such kind",
 	}
 
-	_, error = ParseKind("")
-	if error == nil {
-		t.Error("The empty should is never a valid kind")
-	}
+	for _, invalidInput := range invalidInputs {
+		_, error := ParseKind(invalidInput)
 
-	_, error = ParseKind("no such kind")
-	if error == nil {
-		t.Error("A random string is never a valid kind")
+		if error == nil {
+			t.Error("Expected error with input \"%s\"", invalidInput)
+		}
 	}
 }
 
 func TestParsingValidKinds(t *testing.T) {
-	kind, error := ParseKind("t1")
-	if error != nil {
-		t.Error("Unexpected error when parsing kind t1: " + error.Error())
+	
+	validInputs := []struct {
+		external string
+		internal KindType
+	}{
+		{"t1", Comment},
+		{"t3", Link},
+		{"t5", Subreddit},
 	}
 
-	if kind != Comment {
-		t.Error("Expected to kind type to be comment")
-	}
+	for _, validInput := range validInputs {
+		internalResult, error := ParseKind(validInput.external)
 
-	kind, error = ParseKind("t3")
-	if error != nil {
-		t.Error("Unexpected error when parsing kind t3: " + error.Error())
-	}
+		if error != nil {
+			t.Errorf("Unexpected error with input \"%s\"", validInput.external)
+		}
 
-	if kind != Link {
-		t.Error("Expected to kind type to be comment")
-	}
+		if validInput.internal != internalResult {
+			t.Errorf("Expected %d but got %d", validInput.internal, internalResult)
+		}
 
-	kind, error = ParseKind("t5")
-	if error != nil {
-		t.Error("Unexpected error when parsing kind t5: " + error.Error())
-	}
+		externalResult := validInput.internal.String()
 
-	if kind != Subreddit {
-		t.Error("Expected to kind type to be comment")
-	}
-}
-
-func TestKindStringConversion(t *testing.T) {
-	testString := Comment.String()
-	if testString != "t1" {
-		t.Error("Expected \"t1\" but got \"" + testString + "\"")
-	}
-
-	testString = Link.String()
-	if testString != "t3" {
-		t.Error("Expected \"t3\" but got \"" + testString + "\"")
-	}
-
-	testString = Subreddit.String()
-	if testString != "t5" {
-		t.Error("Expected \"t5\" but got \"" + testString + "\"")
+		if externalResult != validInput.external {
+			t.Errorf("Expected \"%s\" but got \"%s\"", validInput.external, externalResult)
+		}
 	}
 }

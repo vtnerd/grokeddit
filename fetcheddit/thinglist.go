@@ -5,12 +5,6 @@ import (
 	"errors"
 )
 
-type thingIterater interface {
-	setArray([]grokeddit.Thing)
-	hasNext() bool
-	getNext() (grokeddit.Thing, error)
-}
-
 type nextChunk struct {
 	nextThings     []grokeddit.Thing
 	moreThings     bool

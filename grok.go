@@ -23,6 +23,7 @@ type thing struct {
 		Display_name  string          // Name of subreddit (only used with subreddit thing type)
 		Edited        interface{}     // false or utc of last edit
 		Id            string          // unique indentifier for the thing
+		Link_id       string          // Identifies the link associated with a comment
 		Parent_id     string          // parent id of a comment
 		Replies       json.RawMessage // replies to a comment
 		Selftext_html string          // html from a new post
@@ -93,6 +94,7 @@ func createNewThing(in thing) (Thing, error) {
 	subredditName := in.Data.Subreddit
 	subredditId := GlobalId{thingId, Subreddit}
 	parentId := GlobalId{}
+	linkId := GlobalId{}
 	if currentKind != Subreddit {
 		subredditId, error = ParseGlobalId(in.Data.Subreddit_id)
 		if error != nil {
@@ -104,6 +106,13 @@ func createNewThing(in thing) (Thing, error) {
 			parentId, error = ParseGlobalId(in.Data.Parent_id)
 			if error != nil {
 				return Thing{}, errors.New("Unable to grok parent id: " + error.Error())
+			}
+		}
+
+		if len(in.Data.Link_id) != 0 {
+			linkId, error = ParseGlobalId(in.Data.Link_id)
+			if error != nil {
+				return Thing{}, errors.New("Unable to grok link id: " + error.Error())
 			}
 		}
 	} else { // type subreddit
@@ -129,7 +138,7 @@ func createNewThing(in thing) (Thing, error) {
 		}
 	}
 
-	return Thing{in.Data.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, parentId, newReplies, subredditName, subredditId, bodyHtml, in.Data.Title, in.Data.Url}, nil
+	return Thing{in.Data.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, linkId, parentId, newReplies, subredditName, subredditId, bodyHtml, in.Data.Title, in.Data.Url}, nil
 }
 
 func internalGrok(parsedListing listing) (Groked, error) {
@@ -142,7 +151,7 @@ func internalGrok(parsedListing listing) (Groked, error) {
 		if error != nil {
 			return groked, errors.New("Invalid previous listing value: " + error.Error())
 		}
-		
+
 		groked.ListingPrev = &previousListing
 	}
 

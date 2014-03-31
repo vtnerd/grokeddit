@@ -7,6 +7,7 @@ type Thing struct {
 	CreatedUtc    int64    // utc of creation time
 	Id            GlobalId // uniquely indentifies the thing
 	LastUpdateUtc int64    // utc of last update
+	LinkId        GlobalId // identifies the link associated to a comment
 	ParentId      GlobalId // parent id of a comment. null if no parent id exists
 	Replies       Groked   // replies to a comment
 	Subreddit     string   // name of the subreddit associated with the thing

@@ -36,6 +36,6 @@ func ParseGlobalId(globalId string) (GlobalId, error) {
 }
 
 // Returns a string representation for the global ID, as used by reddit.
-func (globalId *GlobalId) String() string {
+func (globalId GlobalId) String() string {
 	return globalId.Kind.String() + "_" + globalId.Id.String()
 }

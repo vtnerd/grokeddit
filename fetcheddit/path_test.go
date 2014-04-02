@@ -65,7 +65,7 @@ func TestPath(t *testing.T) {
 		},
 		{
 			inputData{"/r/all?limit=100&before=t3_r", "", nil, false},
-			expectedResults{"/r/all.json?limit=100", grokeddit.Groked{Children: noChildren}},
+			expectedResults{"/r/all.json?limit=100&", grokeddit.Groked{Children: noChildren}},
 		},
 	}
 

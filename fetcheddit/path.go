@@ -30,8 +30,10 @@ func CreatePath(redditPath string) (Path, error) {
 	}
 
 	// this is added at the last stage
-	redditUrl.Query().Del(redditBeforeModifier)
-	redditUrl.Query().Del(redditAfterModifier)
+	queries := redditUrl.Query()
+	queries.Del(redditBeforeModifier)
+	queries.Del(redditAfterModifier)
+	redditUrl.RawQuery = queries.Encode()
 
 	// flatten once to (hopefully) reduce garbage
 	flattenedPath := redditUrl.String()

@@ -13,12 +13,16 @@ type nextChunk struct {
 
 type thingList struct {
 	fetchMoreThings   func() ([]grokeddit.Thing, bool, error)
-	currentThings     thingIterater // An abstraction for iterating over the current slice of Thing objects. Implementations can change the order of iterating.
+	currentThings     thingIterater // Dictates how a slice returned by fetchMoreThings is iterated
 	moreThings        bool          // The last value returned by fetchMoreThings
 	chunkChannel chan nextChunk
 }
 
-func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, error), anchor *AnchorPoint) (thingList, error) {
+func fetchThingList(
+	fetchGroked func(Fetcher, *AnchorPoint) (grokeddit.Groked, error), 
+	contentFetcher Fetcher,
+	anchor *AnchorPoint) (thingList, error) {
+
 	var currentThingIterater thingIterater
 	var fetchMore func() ([]grokeddit.Thing, bool, error)
 
@@ -33,7 +37,7 @@ func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, err
 	if anchor == nil || anchor.Direction == Next {
 		currentThingIterater = &forwardThingIterate{}
 		fetchMore = func() ([]grokeddit.Thing, bool, error) {
-			newGroked, error := fetchGroked(anchor)
+			newGroked, error := fetchGroked(contentFetcher, anchor)
 			if error != nil {
 				return nil, false, error
 			}
@@ -52,7 +56,7 @@ func fetchThingList(fetchGroked func(anchor *AnchorPoint) (grokeddit.Groked, err
 	} else {
 		currentThingIterater = &reverseThingIterate{}
 		fetchMore = func() ([]grokeddit.Thing, bool, error) {
-			newGroked, error := fetchGroked(anchor)
+			newGroked, error := fetchGroked(contentFetcher, anchor)
 			if error != nil {
 				return nil, false, error
 			}

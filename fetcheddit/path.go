@@ -3,68 +3,64 @@ package fetcheddit
 import (
 	"code.leeclagett.com/grokeddit"
 	"errors"
-	"net/http"
 	"net/url"
 	"strings"
 )
 
 const (
-	redditRequestScheme = "http"
-	redditHost = "www.reddit.com"
-	redditJsonSuffix = ".json"
+	redditJsonSuffix     = ".json"
 	redditBeforeModifier = "before"
-	redditAfterModifier = "after"
+	redditAfterModifier  = "after"
 )
 
-type Path string 
+type Path string
 
-func CreatePath(redditPath *url.URL) Path {
-	if redditPath == nil {
-		redditPath = new(url.URL)
+func CreatePath(redditPath string) (Path, error) {
+
+	redditUrl, error := url.Parse(redditPath)
+	if error != nil {
+		return "", errors.New("Bad reddit path: " + error.Error())
 	}
 
-	redditPath.Scheme = redditRequestScheme
-	redditPath.Host = redditHost
+	redditUrl.Scheme = ""
+	redditUrl.Host = ""
 
-	if !strings.HasSuffix(redditPath.Path, redditJsonSuffix) {
-		redditPath.Path = redditPath.Path + redditJsonSuffix
+	if !strings.HasSuffix(redditUrl.Path, redditJsonSuffix) {
+		redditUrl.Path = redditUrl.Path + redditJsonSuffix
 	}
 
 	// this is added at the last stage
-	redditPath.Query().Del(redditBeforeModifier)
-	redditPath.Query().Del(redditAfterModifier)
+	redditUrl.Query().Del(redditBeforeModifier)
+	redditUrl.Query().Del(redditAfterModifier)
 
 	// flatten once to (hopefully) reduce garbage
-	flattenedPath := redditPath.String()
+	flattenedPath := redditUrl.String()
 
-	// this is the sketchiest part -- assume dangling ? and & are 
+	// this is the sketchiest part -- assume dangling ? and & are
 	// acceptable, and assume they won't be present in these situations ...
 	// unittests can at least catch unexpected string values.
-	if len(redditPath.Query()) == 0 {
+	if len(redditUrl.Query()) == 0 {
 		flattenedPath = flattenedPath + "?"
 	} else {
 		flattenedPath = flattenedPath + "&"
 	}
 
-	return Path(flattenedPath)
+	return Path(flattenedPath), nil
 }
 
-func (path Path) FetchGrokedListing(anchor *AnchorPoint) (grokeddit.Groked, error) {
-	retrieveLocation := string(path)
+func (path Path) FetchGrokedListing(contentFetcher Fetcher, anchor *AnchorPoint) (grokeddit.Groked, error) {
+	retrievePath := string(path)
 
 	if anchor != nil {
-		retrieveLocation = retrieveLocation + anchor.String()
+		retrievePath = retrievePath + anchor.String()
 	}
 
-	response, error := http.Get(retrieveLocation)
+	fetched, error := contentFetcher.Fetch(retrievePath)
+
 	if error != nil {
-		return grokeddit.Groked{}, errors.New("Unable to retrieve listing [" + retrieveLocation + "]: " + error.Error())
+		return grokeddit.Groked{}, errors.New("Unable to retrieve listing [" + retrievePath + "]: " + error.Error())
 	}
 
-	if response.StatusCode != 200 {
-		return grokeddit.Groked{}, errors.New("Unable to retrieve listing [" + retrieveLocation + "]: Expected response code 200")
-	}
-
-	defer response.Body.Close()
-	return grokeddit.GrokListing(response.Body)
+	defer fetched.Close()
+	return grokeddit.GrokListing(fetched)
 }

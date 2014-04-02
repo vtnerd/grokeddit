@@ -29,11 +29,13 @@ func CreatePath(redditPath string) (Path, error) {
 		redditUrl.Path = redditUrl.Path + redditJsonSuffix
 	}
 
-	// this is added at the last stage
-	queries := redditUrl.Query()
-	queries.Del(redditBeforeModifier)
-	queries.Del(redditAfterModifier)
-	redditUrl.RawQuery = queries.Encode()
+	// before/after is added when path is fetched
+	if len(redditUrl.RawQuery) != 0 {
+		queries := redditUrl.Query()
+		queries.Del(redditBeforeModifier)
+		queries.Del(redditAfterModifier)
+		redditUrl.RawQuery = queries.Encode()
+	}
 
 	// flatten once to (hopefully) reduce garbage
 	flattenedPath := redditUrl.String()
@@ -41,7 +43,7 @@ func CreatePath(redditPath string) (Path, error) {
 	// this is the sketchiest part -- assume dangling ? and & are
 	// acceptable, and assume they won't be present in these situations ...
 	// unittests can at least catch unexpected string values.
-	if len(redditUrl.Query()) == 0 {
+	if len(redditUrl.RawQuery) == 0 { // len can change after removal above
 		flattenedPath = flattenedPath + "?"
 	} else {
 		flattenedPath = flattenedPath + "&"

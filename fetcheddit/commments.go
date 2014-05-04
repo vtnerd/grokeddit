@@ -21,5 +21,15 @@ func (comments *Comments) GetNext() (Comment, error) {
 		return Comment{}, errors.New("Unable to retrieve next link: " + error.Error())
 	}
 
-	return Comment{nextThing.Author, nextThing.CreatedUtc, nextThing.Id, nextThing.LastUpdateUtc, nextThing.ParentId, nextThing.Replies, nextThing.Subreddit, nextThing.SubredditId, nextThing.Text_html}, nil
+	return Comment{
+		nextThing.Author, 
+		nextThing.CreatedUtc, 
+		nextThing.Id, 
+		nextThing.LastUpdateUtc, 
+		nextThing.ParentId, 
+		nextThing.Replies, 
+		nextThing.Subreddit, 
+		nextThing.SubredditId, 
+		nextThing.Text_html,
+	}, nil
 }

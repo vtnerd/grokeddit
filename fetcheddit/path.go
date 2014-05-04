@@ -13,8 +13,14 @@ const (
 	redditAfterModifier  = "after"
 )
 
+// Represents a resource on Reddit (page of links, comments, etc.)
 type Path string
 
+/* Create a new path object. The redditPath should be a relative path to the
+desired resource. The path will automatically be "cleaned" up,
+references to "before" and "after" in the query portion are removed. A ? or &
+will automatically be added to the end so that a "before" or "after" can be
+added to the Query portion without constructing another url.URL object. */
 func CreatePath(redditPath string) (Path, error) {
 
 	redditUrl, error := url.Parse(redditPath)
@@ -52,6 +58,8 @@ func CreatePath(redditPath string) (Path, error) {
 	return Path(flattenedPath), nil
 }
 
+/* Retrieves the path, at the specified anchor point (page), using the provided
+ Fetcher.  */
 func (path Path) FetchGrokedListing(contentFetcher Fetcher, anchor *AnchorPoint) (grokeddit.Groked, error) {
 	retrievePath := string(path)
 

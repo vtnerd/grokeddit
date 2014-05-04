@@ -12,14 +12,14 @@ type nextChunk struct {
 }
 
 type thingList struct {
-	fetchMoreThings   func() ([]grokeddit.Thing, bool, error)
-	currentThings     thingIterater // Dictates how a slice returned by fetchMoreThings is iterated
-	moreThings        bool          // The last value returned by fetchMoreThings
-	chunkChannel chan nextChunk
+	fetchMoreThings func() ([]grokeddit.Thing, bool, error)
+	currentThings   thingIterater // Dictates how a slice returned by fetchMoreThings is iterated
+	moreThings      bool          // The last value returned by fetchMoreThings
+	chunkChannel    chan nextChunk
 }
 
 func fetchThingList(
-	fetchGroked func(Fetcher, *AnchorPoint) (grokeddit.Groked, error), 
+	fetchGroked func(Fetcher, *AnchorPoint) (grokeddit.Groked, error),
 	contentFetcher Fetcher,
 	anchor *AnchorPoint) (thingList, error) {
 
@@ -107,7 +107,7 @@ func (list *thingList) getNext() (grokeddit.Thing, error) {
 	}
 
 	if !list.currentThings.hasNext() {
-		nextChunk := <- list.chunkChannel
+		nextChunk := <-list.chunkChannel
 
 		if nextChunk.moreThings {
 			list.fetchNextBlockAsync()

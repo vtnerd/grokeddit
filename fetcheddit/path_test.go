@@ -67,6 +67,50 @@ func TestPath(t *testing.T) {
 			inputData{"/r/all?limit=100&before=t3_r", "", nil, false},
 			expectedResults{"/r/all.json?limit=100&", grokeddit.Groked{Children: noChildren}},
 		},
+		{
+			inputData{"/r/all?limit=100&after=t3_r", "", nil, false},
+			expectedResults{"/r/all.json?limit=100&", grokeddit.Groked{Children: noChildren}},
+		},
+		{
+			inputData{"/r/all?limit=100&before=t3_er&after=t3_r", "", nil, false},
+			expectedResults{"/r/all.json?limit=100&", grokeddit.Groked{Children: noChildren}},
+		},
+		{
+			inputData{
+				"/r/all?limit=100&before=t3_er&after=t3_r", 
+				"", 
+				&AnchorPoint{grokeddit.GlobalId{100, grokeddit.Comment}, Previous}, 
+				false,
+			},
+			expectedResults{"/r/all.json?limit=100&before=t1_2s", grokeddit.Groked{Children: noChildren}},
+		},
+		{
+			inputData{
+				"/r/all?limit=100&before=t3_er&after=t3_r", 
+				"", 
+				&AnchorPoint{grokeddit.GlobalId{105, grokeddit.Link}, Next}, 
+				false,
+			},
+			expectedResults{"/r/all.json?limit=100&after=t3_2x", grokeddit.Groked{Children: noChildren}},
+		},
+		{
+			inputData{
+				"/r/all?limit=100&before=t3_er&after=t3_r", 
+				listingInput, 
+				nil, 
+				false,
+			},
+			expectedResults{"/r/all.json?limit=100&", listingOutput},
+		},
+		{
+			inputData{
+				"/r/all?limit=100&before=t3_er&after=t3_r&blah=foo", 
+				listingInput, 
+				&AnchorPoint{grokeddit.GlobalId{109, grokeddit.Subreddit}, Next}, 
+				false,
+			},
+			expectedResults{"/r/all.json?blah=foo&limit=100&after=t5_31", listingOutput},
+		},
 	}
 
 	for _, test := range tests {

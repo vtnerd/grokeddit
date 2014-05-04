@@ -21,5 +21,17 @@ func (links *Links) GetNext() (Link, error) {
 		return Link{}, errors.New("Unable to retrieve next link: " + error.Error())
 	}
 
-	return Link{nextThing.Author, nextThing.CreatedUtc, nextThing.Id, nextThing.LastUpdateUtc, nextThing.Replies, nextThing.Subreddit, nextThing.SubredditId, nextThing.Text_html, nextThing.Title, nextThing.Url}, nil
+	return Link{
+		nextThing.Author, 
+		nextThing.CreatedUtc, 
+		nextThing.Id, 
+		nextThing.LastUpdateUtc, 
+		nextThing.Replies, 
+		nextThing.Subreddit, 
+		nextThing.SubredditId, 
+		nextThing.Text_html, 
+		nextThing.Title, 
+		nextThing.Url,
+	}, 
+	nil
 }

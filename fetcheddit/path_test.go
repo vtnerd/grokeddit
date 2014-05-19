@@ -120,22 +120,32 @@ func TestPath(t *testing.T) {
 			t.Fatalf("Unexpected error with input path \"%s\"", test.input.redditPath)
 		}
 
-		testFetcher := &TestFetch{NextReturn: test.input.fetchedData, FetchError: test.input.fetchError}
-		groked, error := path.FetchGrokedListing(testFetcher, test.input.anchor)
-
 		if test.input.fetchError {
+			testFetcher := CreateTestFetch(nil)
+			_, error := path.FetchGrokedListing(testFetcher, test.input.anchor)
+
 			if error == nil {
 				t.Error("Expected error on Fetch call")
 			}
 		} else {
+
+			testFetcher := CreateTestFetch([]string{test.input.fetchedData})
+			groked, error := path.FetchGrokedListing(testFetcher, test.input.anchor)
+
 			if error != nil {
 				t.Error("Unexpected error on Fetch call")
 			}
 
-			if testFetcher.LastFetchPath != test.expected.fetchPath {
+			lastPath, error := testFetcher.GetNextFetchLocation()
+
+			if error != nil {
+				t.Errorf("Unexpected error: %s", error)
+			}
+
+			if lastPath != test.expected.fetchPath {
 				t.Errorf("Expected fetch path \"%s\" but got fetch path \"%s\"",
 					test.expected.fetchPath,
-					testFetcher.LastFetchPath)
+					lastPath)
 			}
 
 			if !reflect.DeepEqual(groked, test.expected.result) {

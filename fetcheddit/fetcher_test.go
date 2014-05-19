@@ -113,7 +113,7 @@ const (
 )
 
 var (
-	listingOutput = grokeddit.Groked {
+	listingOutput = grokeddit.Groked{
 		nil,
 		&grokeddit.GlobalId{121546245, grokeddit.Link},
 		[]grokeddit.Thing{
@@ -149,17 +149,39 @@ var (
 )
 
 type TestFetch struct {
-	LastFetchPath string // The last path provided in a Fetch call
-	NextReturn    string // String that will be returned in the next Fetch call
-	FetchError    bool   // True indicates the fetch call should error
+	nextValue     chan *string
+	lastFetchPath chan *string
 }
 
-func (testFetch *TestFetch) Fetch(path string) (io.ReadCloser, error) {
-	testFetch.LastFetchPath = path
+func CreateTestFetch(values []string) TestFetch {
+	newTestFetch := TestFetch{
+		make(chan *string, len(values)),
+		make(chan *string, len(values))}
 
-	if testFetch.FetchError {
-		return nil, errors.New("Expected error return")
+	defer close(newTestFetch.nextValue)
+	for _, value := range values {
+		newTestFetch.nextValue <- &value
 	}
 
-	return ioutil.NopCloser(strings.NewReader(testFetch.NextReturn)), nil
+	return newTestFetch
+}
+
+func (testFetch TestFetch) Fetch(path string) (io.ReadCloser, error) {
+	nextValue := <-testFetch.nextValue
+	if nextValue == nil {
+		close(testFetch.lastFetchPath)
+		return nil, errors.New("No more values to fetch")
+	}
+
+	testFetch.lastFetchPath <- &path
+	return ioutil.NopCloser(strings.NewReader(*nextValue)), nil
+}
+
+func (testFetch TestFetch) GetNextFetchLocation() (string, error) {
+	nextValue := <-testFetch.lastFetchPath
+	if nextValue == nil {
+		return "", errors.New("No more fetch locations")
+	}
+
+	return *nextValue, nil
 }

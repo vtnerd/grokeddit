@@ -128,6 +128,9 @@ func (list *thingList) getNext() (grokeddit.Thing, error) {
 	if !list.currentThings.hasNext() {
 		nextChunk := <-list.chunkChannel
 
+		// set this variable now, a channel check can only be
+		// done if async request is active.
+		list.moreThings = nextChunk.moreThings
 		if nextChunk.moreThings {
 			list.fetchNextBlockAsync()
 		}
@@ -136,7 +139,6 @@ func (list *thingList) getNext() (grokeddit.Thing, error) {
 			return grokeddit.Thing{}, errors.New("Unable to fetch more things: " + nextChunk.retrievalError.Error())
 		}
 
-		list.moreThings = nextChunk.moreThings
 		list.currentThings.setArray(nextChunk.nextThings)
 	}
 

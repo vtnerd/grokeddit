@@ -3,6 +3,8 @@ package fetcheddit
 import (
 	"code.leeclagett.com/grokeddit"
 	"errors"
+	
+"log"
 )
 
 // Aggregate returned in the channel that fetches reddit thing lists
@@ -22,17 +24,17 @@ type thingList struct {
 	chunkChannel    chan nextChunk                          // Receives the next page of reddit things
 }
 
-/* Creates a new thing list. 
+/* Creates a new thing list.
 
 The closure arugment (fetchedGroked) allows the caller to handle differences in
-the reddit API. The lists can be sent in two different ways depending on the 
-context, and the caller must massage those differences into a single Groked 
+the reddit API. The lists can be sent in two different ways depending on the
+context, and the caller must massage those differences into a single Groked
 object.
 
-The contentFetcher allows the caller to modify how the reddit things are being 
+The contentFetcher allows the caller to modify how the reddit things are being
 retrieved, mainly used for testing (possibly different URLs too).
 
-The anchor specifies a starting point, and an iteration direction. NULL 
+The anchor specifies a starting point, and an iteration direction. NULL
 indicates to start from the beginning, and iterate forward. */
 func fetchThingList(
 	fetchGroked func(Fetcher, *AnchorPoint) (grokeddit.Groked, error),
@@ -73,22 +75,16 @@ func fetchThingList(
 		currentThingIterater = &reverseThingIterate{}
 		fetchMore = func() ([]grokeddit.Thing, bool, error) {
 			newGroked, error := fetchGroked(contentFetcher, anchor)
+
 			if error != nil {
 				return nil, false, error
 			}
 
-			// There is a bug on the reddit side, the "before"
-			// field is always NULL with a before request. This is
-			// solved with a hack that will do 1 extra request
-			// than necessary, the additional traffic is on you
-			// reddit.
-			more := false
-			if newGroked.Children != nil && len(newGroked.Children) > 0 {
-				anchor.Anchor = newGroked.Children[0].Id
-				more = true
+			if newGroked.ListingPrev != nil {
+				anchor.Anchor = *newGroked.ListingPrev
 			}
 
-			return newGroked.Children, more, nil
+			return newGroked.Children, newGroked.ListingPrev != nil, nil
 		}
 	}
 
@@ -98,7 +94,12 @@ func fetchThingList(
 	}
 
 	currentThingIterater.setArray(firstThings)
-	newThingList := thingList{fetchMore, currentThingIterater, moreThings, make(chan nextChunk)}
+	newThingList := thingList{
+		fetchMore,
+		currentThingIterater,
+		moreThings,
+		make(chan nextChunk),
+	}
 
 	if moreThings {
 		newThingList.fetchNextBlockAsync()

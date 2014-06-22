@@ -138,7 +138,20 @@ func createNewThing(in thing) (Thing, error) {
 		}
 	}
 
-	return Thing{in.Data.Author, creationTime, GlobalId{thingId, currentKind}, lastModificationTime, linkId, parentId, newReplies, subredditName, subredditId, bodyHtml, in.Data.Title, in.Data.Url}, nil
+	return Thing{
+		in.Data.Author, 
+		creationTime, 
+		GlobalId{thingId, currentKind}, 
+		lastModificationTime, 
+		linkId, 
+		parentId, 
+		newReplies, 
+		subredditName, 
+		subredditId, 
+		bodyHtml, 
+		in.Data.Title, 
+		in.Data.Url
+	}, nil
 }
 
 func internalGrok(parsedListing listing) (Groked, error) {

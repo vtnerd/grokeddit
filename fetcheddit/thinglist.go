@@ -3,8 +3,6 @@ package fetcheddit
 import (
 	"code.leeclagett.com/grokeddit"
 	"errors"
-	
-"log"
 )
 
 // Aggregate returned in the channel that fetches reddit thing lists

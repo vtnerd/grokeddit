@@ -150,7 +150,7 @@ func createNewThing(in thing) (Thing, error) {
 		subredditId, 
 		bodyHtml, 
 		in.Data.Title, 
-		in.Data.Url
+		in.Data.Url,
 	}, nil
 }
 

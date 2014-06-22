@@ -12,6 +12,6 @@ type AnchorPoint struct {
 }
 
 /* Return the anchor point as a string. Example: "before=t3_blah" */
-func (anchor *AnchorPoint) String() string {
+func (anchor AnchorPoint) String() string {
 	return anchor.Direction.String() + "=" + anchor.Anchor.String()
 }

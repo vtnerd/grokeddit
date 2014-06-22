@@ -11,7 +11,6 @@ import (
 inputs to url.Parse that fail.
 */
 
-
 func TestPath(t *testing.T) {
 
 	type inputData struct {
@@ -77,39 +76,39 @@ func TestPath(t *testing.T) {
 		},
 		{
 			inputData{
-				"/r/all?limit=100&before=t3_er&after=t3_r", 
-				"", 
-				&AnchorPoint{grokeddit.GlobalId{100, grokeddit.Comment}, Previous}, 
+				"/r/all?limit=100&before=t3_er&after=t3_r",
+				"",
+				&AnchorPoint{grokeddit.GlobalId{100, grokeddit.Comment}, Previous},
 				false,
 			},
 			expectedResults{"/r/all.json?limit=100&before=t1_2s", grokeddit.Groked{Children: noChildren}},
 		},
 		{
 			inputData{
-				"/r/all?limit=100&before=t3_er&after=t3_r", 
-				"", 
-				&AnchorPoint{grokeddit.GlobalId{105, grokeddit.Link}, Next}, 
+				"/r/all?limit=100&before=t3_er&after=t3_r",
+				"",
+				&AnchorPoint{grokeddit.GlobalId{105, grokeddit.Link}, Next},
 				false,
 			},
 			expectedResults{"/r/all.json?limit=100&after=t3_2x", grokeddit.Groked{Children: noChildren}},
 		},
 		{
 			inputData{
-				"/r/all?limit=100&before=t3_er&after=t3_r", 
-				listingInput, 
-				nil, 
+				"/r/all?limit=100&before=t3_er&after=t3_r",
+				listingForward,
+				nil,
 				false,
 			},
-			expectedResults{"/r/all.json?limit=100&", listingOutput},
+			expectedResults{"/r/all.json?limit=100&", listingOutputForward},
 		},
 		{
 			inputData{
-				"/r/all?limit=100&before=t3_er&after=t3_r&blah=foo", 
-				listingInput, 
-				&AnchorPoint{grokeddit.GlobalId{109, grokeddit.Subreddit}, Next}, 
+				"/r/all?limit=100&before=t3_er&after=t3_r&blah=foo",
+				listingForward,
+				&AnchorPoint{grokeddit.GlobalId{109, grokeddit.Subreddit}, Next},
 				false,
 			},
-			expectedResults{"/r/all.json?blah=foo&limit=100&after=t5_31", listingOutput},
+			expectedResults{"/r/all.json?blah=foo&limit=100&after=t5_31", listingOutputForward},
 		},
 	}
 

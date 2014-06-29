@@ -285,16 +285,16 @@ var (
 )
 
 type TestFetch struct {
-	nextValue     chan string
-	lastFetchPath chan string
+	nextValue       chan string
+	lastFetchPath   chan string
+	closedFetchPath bool
 }
-
-
 
 func CreateTestFetch(values []string) *TestFetch {
 	newTestFetch := TestFetch{
 		make(chan string, len(values)),
 		make(chan string, len(values)),
+		false,
 	}
 
 	defer close(newTestFetch.nextValue)
@@ -308,7 +308,10 @@ func CreateTestFetch(values []string) *TestFetch {
 func (testFetch *TestFetch) Fetch(path string) (io.ReadCloser, error) {
 	nextValue, ok := <-testFetch.nextValue
 	if !ok {
-		close(testFetch.lastFetchPath)
+		if !testFetch.closedFetchPath {
+			close(testFetch.lastFetchPath)
+			testFetch.closedFetchPath = true
+		}
 		return nil, errors.New("No more values to fetch")
 	}
 

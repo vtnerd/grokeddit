@@ -1,6 +1,9 @@
 package fetcheddit
 
-import "errors"
+import (
+	"errors"
+	"code.leeclagett.com/grokeddit"
+)
 
 type Comments struct {
 	things thingList
@@ -19,6 +22,11 @@ func (comments *Comments) GetNext() (Comment, error) {
 	nextThing, error := comments.things.getNext()
 	if error != nil {
 		return Comment{}, errors.New("Unable to retrieve next link: " + error.Error())
+	}
+
+	if nextThing.Id.Kind != grokeddit.Comment {
+		return Comment{}, errors.New(
+			"Expected type \"Comment\" but got \"" + nextThing.Id.Kind.String() + "\"")
 	}
 
 	return Comment{

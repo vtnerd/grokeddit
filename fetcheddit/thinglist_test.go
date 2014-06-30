@@ -17,11 +17,6 @@ func TestThingList(t *testing.T) {
 		requested []string
 	}
 
-	type TestData struct {
-		input    Input
-		expected Expected
-	}
-
 	// not sure how much how like this ... but I want to keep the two above
 	// structs hidden to this file, not sure of any other way in Go
 	validateThingList := func(
@@ -89,7 +84,10 @@ func TestThingList(t *testing.T) {
 		}
 	}
 
-	tests := []TestData{
+	tests := []struct {
+		input    Input
+		expected Expected
+	}{
 		// Test errors on first retrieval
 		{Input{[]string{}, nil}, Expected{[]*grokeddit.Thing{}, []string{}}},
 		{

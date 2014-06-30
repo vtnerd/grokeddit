@@ -77,7 +77,7 @@ func TestThingList(t *testing.T) {
 		if error == nil {
 			t.Errorf("Did not fetch all paths")
 		}
-		
+
 		leftoverPath, error := actual.GetNextFetchLocation()
 		if error == nil {
 			t.Errorf("Expected another path retrieval \"%s\"", leftoverPath)
@@ -227,22 +227,23 @@ func TestThingList(t *testing.T) {
 		path, error := CreatePath("test_path")
 		if error != nil {
 			t.Error("Couldn't create path!")
-		}
+		} else {
 
-		testFetch := CreateTestFetch(test.input.list)
-		thingList, error := fetchThingList(
-			path.FetchGrokedListing,
-			testFetch,
-			test.input.initialAnchor)
+			testFetch := CreateTestFetch(test.input.list)
+			thingList, error := fetchThingList(
+				path.FetchGrokedListing,
+				testFetch,
+				test.input.initialAnchor)
 
-		if error != nil {
-			if len(test.expected.output) != 0 {
-				t.Error("Unexpected error when creating thing list")
+			if error != nil {
+				if len(test.expected.output) != 0 {
+					t.Error("Unexpected error when creating thing list")
+				}
+			} else { // no error retrieving first block
+				validateThingList(t, test.expected.output, thingList)
 			}
-		} else { // no error retrieving first block
-			validateThingList(t, test.expected.output, thingList)
-		}
 
-		validateFetched(t, test.expected.requested, testFetch)
+			validateFetched(t, test.expected.requested, testFetch)
+		}
 	}
 }

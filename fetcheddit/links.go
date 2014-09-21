@@ -1,8 +1,8 @@
 package fetcheddit
 
 import (
-	"errors"
 	"code.leeclagett.com/grokeddit"
+	"errors"
 )
 
 type Links struct {
@@ -30,16 +30,16 @@ func (links *Links) GetNext() (Link, error) {
 	}
 
 	return Link{
-		nextThing.Author, 
-		nextThing.CreatedUtc, 
-		nextThing.Id, 
-		nextThing.LastUpdateUtc, 
-		nextThing.Replies, 
-		nextThing.Subreddit, 
-		nextThing.SubredditId, 
-		nextThing.Text_html, 
-		nextThing.Title, 
-		nextThing.Url,
-	}, 
-	nil
+			nextThing.Author,
+			nextThing.CreatedUtc,
+			nextThing.Id,
+			nextThing.LastUpdateUtc,
+			nextThing.Replies,
+			nextThing.Subreddit,
+			nextThing.SubredditId,
+			nextThing.Text_html,
+			nextThing.Title,
+			nextThing.Url,
+		},
+		nil
 }

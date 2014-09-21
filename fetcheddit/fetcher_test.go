@@ -236,7 +236,8 @@ var (
 			grokeddit.Thing{
 				"Grimzentide",
 				1394793933,
-				grokeddit.GlobalId{121593987, grokeddit.Link}, 1394793933,
+				grokeddit.GlobalId{121593987, grokeddit.Link},
+				1394793933,
 				grokeddit.GlobalId{},
 				grokeddit.GlobalId{},
 				grokeddit.Groked{},

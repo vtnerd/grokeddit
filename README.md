@@ -3,7 +3,7 @@ grokeddit
 
 Library for interacting with Reddit API in Go! The library provides an easy interface for retrieving links and comments from Reddit. Example:
 ```go
-subredditsHandle, error := fetcheddit.FetchSubreddits({"music", "movies"}, fetcheddit.DefaultFetch)
+subredditsHandle, error := fetcheddit.FetchSubreddits([]string{"music", "movies"}, fetcheddit.DefaultFetch)
 if error != nil {
   return error
 }
